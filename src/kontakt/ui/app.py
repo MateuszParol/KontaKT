@@ -49,6 +49,10 @@ class App(ctk.CTk):
         if view_name == "invoice_add":
             view = InvoiceAddView(self.content_frame, ai_engine=self.ai_engine)
             view.pack(fill="both", expand=True)
+        elif view_name == "history":
+            from kontakt.ui.views.history import HistoryView
+            view = HistoryView(self.content_frame)
+            view.pack(fill="both", expand=True)
         elif view_name == "accounts":
             view = AccountsView(self.content_frame)
             view.pack(fill="both", expand=True)
