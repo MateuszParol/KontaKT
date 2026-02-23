@@ -5,10 +5,17 @@ from kontakt.ui.views.sidebar import Sidebar
 from kontakt.ui.views.invoice_add import InvoiceAddView
 from kontakt.ui.views.accounts import AccountsView
 from kontakt.ui.views.contractors import ContractorsView
+import threading
+from kontakt.ai.engine import AIEngine
 
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
+        
+        self.ai_engine = AIEngine()
+        # Train engine in background so it doesn't block UI
+        threading.Thread(target=self.ai_engine.train, daemon=True).start()
+
 
         self.title("KontaKT - System Księgowości Budżetowej")
         self.geometry("1100x700")
@@ -40,7 +47,7 @@ class App(ctk.CTk):
 
         # Show new view
         if view_name == "invoice_add":
-            view = InvoiceAddView(self.content_frame)
+            view = InvoiceAddView(self.content_frame, ai_engine=self.ai_engine)
             view.pack(fill="both", expand=True)
         elif view_name == "accounts":
             view = AccountsView(self.content_frame)
