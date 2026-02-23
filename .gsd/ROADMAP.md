@@ -26,6 +26,7 @@
 **Status**: ⬜ Not Started
 **Cel**: Umożliwienie użytkownikowi wykorzystania wyników pracy programu.
 **Wymagania**:
+- [ ] Import Planu Kont z pliku `.xls` (kolumny `WY_KONTO`, `WY_NAZWA`, `KONTO`) z poziomu GUI.
 - [ ] Eksport do PDF (Polecenie Księgowania).
 - [ ] Eksport do Excela (Zestawienie dekretacji).
 - [ ] Historia operacji z możliwością wyszukiwania.
