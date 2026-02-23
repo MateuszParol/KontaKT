@@ -19,6 +19,11 @@ class HistoryView(ctk.CTkFrame):
         
         self.header = ctk.CTkLabel(self.header_frame, text="Historia Operacji", font=ctk.CTkFont(size=24, weight="bold"))
         self.header.pack(side="left")
+
+        # Search Bar
+        self.entry_search = ctk.CTkEntry(self.header_frame, placeholder_text="Szukaj faktury...", width=250)
+        self.entry_search.pack(side="left", padx=20)
+        self.entry_search.bind("<KeyRelease>", self.on_search)
         
         self.btn_export_all = ctk.CTkButton(self.header_frame, text="Eksportuj Dziennik (Excel)", fg_color="green", command=self.export_all_excel)
         self.btn_export_all.pack(side="right", padx=10)
@@ -43,11 +48,20 @@ class HistoryView(ctk.CTkFrame):
 
         self.refresh_list()
 
+    def on_search(self, event):
+        self.refresh_list()
+
     def refresh_list(self):
         for widget in self.scroll_frame.winfo_children():
             widget.destroy()
             
-        invoices = Invoice.select().order_by(Invoice.date_issue.desc())
+        phrase = self.entry_search.get().strip()
+        
+        query = Invoice.select()
+        if phrase:
+            query = query.where(Invoice.number.contains(phrase) | Invoice.description.contains(phrase))
+
+        invoices = query.order_by(Invoice.date_issue.desc()).limit(100)
         
         for inv in invoices:
             row_frame = ctk.CTkFrame(self.scroll_frame, fg_color="transparent")

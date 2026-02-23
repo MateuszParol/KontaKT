@@ -17,6 +17,10 @@ class AccountsView(ctk.CTkFrame):
         
         self.header = ctk.CTkLabel(self.header_frame, text="Plan Kont", font=ctk.CTkFont(size=24, weight="bold"))
         self.header.pack(side="left")
+        # Search Bar
+        self.entry_search = ctk.CTkEntry(self.header_frame, placeholder_text="Szukaj konta (nazwa lub symbol)...", width=250)
+        self.entry_search.pack(side="left", padx=20)
+        self.entry_search.bind("<KeyRelease>", self.on_search)
         
         self.btn_import = ctk.CTkButton(self.header_frame, text="Importuj z Excela (.xls)", command=self.import_from_excel)
         self.btn_import.pack(side="right")
@@ -43,13 +47,23 @@ class AccountsView(ctk.CTkFrame):
 
         self.refresh_list()
 
+    def on_search(self, event):
+        self.refresh_list()
+
     def refresh_list(self):
         # Clear list
         for widget in self.scroll_frame.winfo_children():
             widget.destroy()
             
-        # Fetch accounts
-        accounts = Account.select().order_by(Account.symbol)
+        phrase = self.entry_search.get().strip()
+            
+        # Fetch accounts with limit 100 for performance
+        query = Account.select()
+        if phrase:
+            query = query.where(Account.name.contains(phrase) | Account.symbol.contains(phrase))
+        
+        accounts = query.order_by(Account.symbol).limit(100)
+        
         for acc in accounts:
             lbl = ctk.CTkLabel(self.scroll_frame, text=f"{acc.symbol} - {acc.name}", anchor="w")
             lbl.pack(fill="x", padx=5, pady=2)

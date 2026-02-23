@@ -9,9 +9,17 @@ class ContractorsView(ctk.CTkFrame):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
 
-        # Header
-        self.header = ctk.CTkLabel(self, text="Kontrahenci", font=ctk.CTkFont(size=24, weight="bold"))
-        self.header.grid(row=0, column=0, padx=20, pady=20, sticky="w")
+        # Header Frame
+        self.header_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.header_frame.grid(row=0, column=0, padx=20, pady=20, sticky="ew")
+
+        self.header = ctk.CTkLabel(self.header_frame, text="Kontrahenci", font=ctk.CTkFont(size=24, weight="bold"))
+        self.header.pack(side="left")
+
+        # Search Bar
+        self.entry_search = ctk.CTkEntry(self.header_frame, placeholder_text="Szukaj (NIP / Nazwa)...", width=250)
+        self.entry_search.pack(side="left", padx=20)
+        self.entry_search.bind("<KeyRelease>", self.on_search)
 
         # List Area
         self.scroll_frame = ctk.CTkScrollableFrame(self)
@@ -32,11 +40,20 @@ class ContractorsView(ctk.CTkFrame):
 
         self.refresh_list()
 
+    def on_search(self, event):
+        self.refresh_list()
+
     def refresh_list(self):
         for widget in self.scroll_frame.winfo_children():
             widget.destroy()
             
-        contractors = Contractor.select().order_by(Contractor.name)
+        phrase = self.entry_search.get().strip()
+        
+        query = Contractor.select()
+        if phrase:
+            query = query.where(Contractor.name.contains(phrase) | Contractor.nip.contains(phrase))
+
+        contractors = query.order_by(Contractor.name).limit(100)
         for c in contractors:
             lbl = ctk.CTkLabel(self.scroll_frame, text=f"{c.name} (NIP: {c.nip or '-'})", anchor="w")
             lbl.pack(fill="x", padx=5, pady=2)
