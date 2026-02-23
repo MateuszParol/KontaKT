@@ -1,6 +1,8 @@
 
 import customtkinter as ctk
+from customtkinter import filedialog
 from kontakt.database.models import Account
+from kontakt.services.importer import import_accounts_from_excel
 
 class AccountsView(ctk.CTkFrame):
     def __init__(self, master):
@@ -9,9 +11,18 @@ class AccountsView(ctk.CTkFrame):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
 
-        # Header
-        self.header = ctk.CTkLabel(self, text="Plan Kont", font=ctk.CTkFont(size=24, weight="bold"))
-        self.header.grid(row=0, column=0, padx=20, pady=20, sticky="w")
+        # Header Frame
+        self.header_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.header_frame.grid(row=0, column=0, padx=20, pady=20, sticky="ew")
+        
+        self.header = ctk.CTkLabel(self.header_frame, text="Plan Kont", font=ctk.CTkFont(size=24, weight="bold"))
+        self.header.pack(side="left")
+        
+        self.btn_import = ctk.CTkButton(self.header_frame, text="Importuj z Excela (.xls)", command=self.import_from_excel)
+        self.btn_import.pack(side="right")
+        
+        self.lbl_import_status = ctk.CTkLabel(self.header_frame, text="")
+        self.lbl_import_status.pack(side="right", padx=10)
 
         # List Area
         self.scroll_frame = ctk.CTkScrollableFrame(self)
@@ -54,3 +65,23 @@ class AccountsView(ctk.CTkFrame):
                 self.refresh_list()
             except Exception as e:
                 print(f"Error adding account: {e}")
+
+    def import_from_excel(self):
+        filepath = filedialog.askopenfilename(
+            title="Wybierz plik Excel z Planem Kont",
+            filetypes=[("Pliki Excel", "*.xls *.xlsx")]
+        )
+        if not filepath:
+            return
+            
+        self.lbl_import_status.configure(text="Importowanie...", text_color="orange")
+        self.update()
+        
+        added, message = import_accounts_from_excel(filepath)
+        
+        if "Błąd" in message:
+            self.lbl_import_status.configure(text=message, text_color="red")
+        else:
+            self.lbl_import_status.configure(text=message, text_color="green")
+            self.refresh_list()
+

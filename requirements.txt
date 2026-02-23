@@ -4,3 +4,7 @@ pillow
 platformdirs
 packaging
 scikit-learn
+pandas
+xlrd
+openpyxl
+fpdf2
