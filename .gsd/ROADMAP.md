@@ -31,7 +31,15 @@
 - [ ] Eksport do Excela (Zestawienie dekretacji).
 - [ ] Historia operacji z możliwością wyszukiwania.
 
-### Phase 4: Polish & Deploy
+### Phase 4: Optymalizacja Wydajności i Kontrahenci
+**Status**: ⬜ Not Started
+**Cel**: Przywrócenie płynności aplikacji na dużych zbiorach danych i wgranie bazy kontrahentów.
+**Wymagania**:
+- [ ] Ograniczenie list (Konta, Kontrahenci, Historia) do Top 100 wyników.
+- [ ] Wdrożenie pól szybkiego wyszukiwania (filtrowania) nad listami.
+- [ ] Moduł importu Kontrahentów z Excela (mapowanie kolumn takich jak REGON, NIP, Adres do aktualnego modelu Peewee).
+
+### Phase 5: Polish & Deploy
 **Status**: ⬜ Not Started
 **Cel**: Przygotowanie wersji instalacyjnej dla użytkownika końcowego.
 **Wymagania**:
