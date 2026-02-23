@@ -14,6 +14,7 @@
 - [x] Ekran dodawania nowej faktury (pola: Data, Opis, Kwota, Kontrahent).
 - [x] Zarządzanie Planem Kont (CRUD) - *Added in validation*.
 
+
 ### Phase 2: Silnik Inteligencji (AI)
 **Status**: ⬜ Not Started
 **Cel**: Implementacja mechanizmu uczenia się i sugerowania dekretacji.
@@ -39,7 +40,15 @@
 - [ ] Wdrożenie pól szybkiego wyszukiwania (filtrowania) nad listami.
 - [ ] Moduł importu Kontrahentów z Excela (mapowanie kolumn takich jak REGON, NIP, Adres do aktualnego modelu Peewee).
 
-### Phase 5: Polish & Deploy
+### Phase 5: Reorganizacja GUI - Listy Treeview i Interfejs Faktur
+**Status**: ⬜ Not Started
+**Cel**: Ekstremalna optymalizacja renderowania list całobazowych przy zachowaniu stylistyki oraz usprawnienie doświadczenia z polami wyboru z tysięcy jednostek.
+**Wymagania**:
+- [ ] Przebudowa `AccountsView`, `ContractorsView`, `HistoryView` na wysoce wydajne obiekty `ttk.Treeview` zamiast zagnieżdżonych Labeli CustomTkintera. Zniesienie górnych limitów limit(100).
+- [ ] Płynne przewijanie do obsługi nawet n-tysięcznych eksportów.
+- [ ] Zastąpienie limitowanych Dropdownów (CTkOptionMenu) w widoku `InvoicesView` modalnymi oknami Popup wyposażonymi we własne wyszukiwarki do selekcji Kont i Kontrahentów.
+
+### Phase 6: Polish & Deploy
 **Status**: ⬜ Not Started
 **Cel**: Przygotowanie wersji instalacyjnej dla użytkownika końcowego.
 **Wymagania**:

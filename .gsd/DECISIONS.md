@@ -24,3 +24,14 @@
 
 ### Constraints
 - Model `Contractor` posiada obecnie tylko `nip`, `name`, `address`. Dane z Excela (`Ulica`, `Kod pocztowy`, `Miejscowość`) zostaną połączone w jedno pole `address` (np. "Ulica, Kod Miejscowość"). `Pełna nazwa` trafi do `name`. By nie psuć bazy, nie będziemy zmieniać schematu, a jedynie inteligentnie mapować dane.
+
+## Phase 5 Decisions
+
+**Date:** 2026-02-23 (In Progress)
+
+### Approach
+- **Listy (Konta, Kontrahenci, Historia) - Chose:** Zastąpienie CTkScrollableFrame natywnym widgetem **`ttk.Treeview`** przestylowanym pod projekt. Jest to rekomendowane i jedyne rozsądne rozwiązanie umożliwiające ładowanie dziesiątek tysięcy wierszy naraz bez zamrażania UI w CustomTkinter. Limit = brak. Opcja szukajki z Fazy 4 pozostanie jako dynamiczne zawężanie.
+- **Drop-downy z autouzupełnianiem (Wybrór rekordu) - Chose:** Odrzucenie CTkOptionMenu na rzecz "Modalnego Okienka" (Pop-up Toplevel) wyposażonego w widget wyszukiwania + podgląd Listbox/Treeview. Jest to optymalny UX, umożliwiający w fakturach wpisanie części nazwy by zatwierdzić dany wybór z dużej biblioteki bez pomyłek.
+
+### Constraints
+- Widget `ttk.Treeview` wymaga własnego podpięcia paska przewijania (Scrollbar) oraz zmiany konfiguracji `style.configure` na ciemne tło by nie psuć DarkMode CustomTkintera.
