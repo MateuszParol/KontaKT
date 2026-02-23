@@ -7,12 +7,12 @@
 Projekt w fazie realizacji. Zakończono Fazę 1 (Fundamenty). Mamy działającą aplikację desktopową z bazą danych, zarządzaniem kontrahentami/planem kont i formularzem dodawania faktur.
 
 ## Current Position
-- **Phase**: 1 (Completed)
-- **Task**: Phase verified
-- **Status**: Ready for Phase 2 (AI)
+- **Phase**: 2
+- **Task**: Planning complete
+- **Status**: Ready for execution
 
 ## Next Steps
-1. /plan 2 - Plan Phase 2 (AI Engine).
+1. /execute 2
 
 ## Last Session Summary
 Codebase mapping complete.
