@@ -1,6 +1,8 @@
 
 import customtkinter as ctk
+from customtkinter import filedialog
 from kontakt.database.models import Contractor
+from kontakt.services.importer import import_contractors_from_excel
 
 class ContractorsView(ctk.CTkFrame):
     def __init__(self, master):
@@ -20,6 +22,12 @@ class ContractorsView(ctk.CTkFrame):
         self.entry_search = ctk.CTkEntry(self.header_frame, placeholder_text="Szukaj (NIP / Nazwa)...", width=250)
         self.entry_search.pack(side="left", padx=20)
         self.entry_search.bind("<KeyRelease>", self.on_search)
+
+        self.btn_import = ctk.CTkButton(self.header_frame, text="Importuj z Excela (.xls)", command=self.import_from_excel)
+        self.btn_import.pack(side="right")
+        
+        self.lbl_import_status = ctk.CTkLabel(self.header_frame, text="")
+        self.lbl_import_status.pack(side="right", padx=10)
 
         # List Area
         self.scroll_frame = ctk.CTkScrollableFrame(self)
@@ -69,3 +77,22 @@ class ContractorsView(ctk.CTkFrame):
                 self.refresh_list()
             except Exception as e:
                 print(f"Error adding contractor: {e}")
+
+    def import_from_excel(self):
+        filepath = filedialog.askopenfilename(
+            title="Wybierz plik z Bazą Kontrahentów",
+            filetypes=[("Pliki Excel", "*.xls *.xlsx")]
+        )
+        if not filepath:
+            return
+            
+        self.lbl_import_status.configure(text="Importowanie...", text_color="orange")
+        self.update()
+        
+        added, message = import_contractors_from_excel(filepath)
+        
+        if "Błąd" in message:
+            self.lbl_import_status.configure(text=message, text_color="red")
+        else:
+            self.lbl_import_status.configure(text=message, text_color="green")
+            self.refresh_list()
