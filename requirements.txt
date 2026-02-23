@@ -3,3 +3,4 @@ peewee
 pillow
 platformdirs
 packaging
+scikit-learn
