@@ -1,7 +1,7 @@
 
 import customtkinter as ctk
 from kontakt import config
-from kontakt.ui.views.sidebar import Sidebar
+from kontakt.ui.views.navbar import Navbar
 from kontakt.ui.views.invoice_add import InvoiceAddView
 from kontakt.ui.views.accounts import AccountsView
 from kontakt.ui.views.contractors import ContractorsView
@@ -48,18 +48,18 @@ class App(ctk.CTk):
         style.configure("Vertical.TScrollbar", background="#2b2b2b", bordercolor="#2b2b2b", arrowcolor="white", troughcolor="#2b2b2b")
 
 
-        # Layout configuration (1x2)
-        self.grid_columnconfigure(0, weight=0) # Sidebar fixed
-        self.grid_columnconfigure(1, weight=1) # Content flexible
-        self.grid_rowconfigure(0, weight=1)
+        # Layout configuration (2x1)
+        self.grid_columnconfigure(0, weight=1) # Content flexible
+        self.grid_rowconfigure(0, weight=0) # Navbar fixed
+        self.grid_rowconfigure(1, weight=1) # Content flexible
 
-        # Sidebar
-        self.sidebar = Sidebar(self, self.show_view)
-        self.sidebar.grid(row=0, column=0, sticky="nsew")
+        # Navbar
+        self.navbar = Navbar(self, self.show_view)
+        self.navbar.grid(row=0, column=0, sticky="ew")
 
         # Content Area (Frame)
         self.content_frame = ctk.CTkFrame(self, corner_radius=0, fg_color="transparent")
-        self.content_frame.grid(row=0, column=1, sticky="nsew")
+        self.content_frame.grid(row=1, column=0, sticky="nsew")
 
         # Init default view
         self.show_view("invoice_add")
