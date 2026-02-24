@@ -8,6 +8,7 @@ from kontakt.ui.views.contractors import ContractorsView
 import threading
 from tkinter import ttk
 from kontakt.ai.engine import AIEngine
+from kontakt.ui.theme import ThemeManager
 
 class App(ctk.CTk):
     def __init__(self):
@@ -21,31 +22,38 @@ class App(ctk.CTk):
         self.title("KontaKT - System Księgowości Budżetowej")
         self.geometry("1100x700")
         
-        # Set theme
-        ctk.set_appearance_mode("Dark")
-        ctk.set_default_color_theme("blue")
+        # Load Theme
+        self.theme_manager = ThemeManager()
+        self.configure(fg_color=self.theme_manager.get_color("bg_main"))
 
         # Configure scaling and ttk styles for Treeview
         style = ttk.Style(self)
         style.theme_use("default")
+        
+        # Apply theme colors to Treeview
+        bg_secondary = self.theme_manager.get_color("bg_secondary")
+        bg_tertiary = self.theme_manager.get_color("bg_tertiary")
+        text_main = self.theme_manager.get_color("text_main")
+        accent_blue = self.theme_manager.get_color("accent_blue")
+        
         style.configure("Treeview",
-                        background="#2b2b2b",
-                        foreground="white",
+                        background=bg_secondary,
+                        foreground=text_main,
                         rowheight=35,
-                        fieldbackground="#2b2b2b",
-                        bordercolor="#2b2b2b",
+                        fieldbackground=bg_secondary,
+                        bordercolor=bg_secondary,
                         borderwidth=0)
-        style.map('Treeview', background=[('selected', '#1f538d')])
+        style.map('Treeview', background=[('selected', accent_blue)])
         style.configure("Treeview.Heading",
-                        background="#565b5e",
-                        foreground="white",
+                        background=bg_tertiary,
+                        foreground=text_main,
                         relief="flat",
                         padding=5)
         style.map("Treeview.Heading",
-                  background=[('active', '#343638')])
+                  background=[('active', self.theme_manager.get_color("accent_magenta"))])
         
         # Configure Vertical Scrollbar style
-        style.configure("Vertical.TScrollbar", background="#2b2b2b", bordercolor="#2b2b2b", arrowcolor="white", troughcolor="#2b2b2b")
+        style.configure("Vertical.TScrollbar", background=bg_secondary, bordercolor=bg_secondary, arrowcolor=text_main, troughcolor=bg_secondary)
 
 
         # Layout configuration (2x1)
@@ -54,11 +62,11 @@ class App(ctk.CTk):
         self.grid_rowconfigure(1, weight=1) # Content flexible
 
         # Navbar
-        self.navbar = Navbar(self, self.show_view)
+        self.navbar = Navbar(self, self.show_view, self.theme_manager)
         self.navbar.grid(row=0, column=0, sticky="ew")
 
         # Content Area (Frame)
-        self.content_frame = ctk.CTkFrame(self, corner_radius=0, fg_color="transparent")
+        self.content_frame = ctk.CTkFrame(self, corner_radius=0, fg_color=self.theme_manager.get_color("bg_main"))
         self.content_frame.grid(row=1, column=0, sticky="nsew")
 
         # Init default view

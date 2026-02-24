@@ -1,12 +1,13 @@
 import customtkinter as ctk
 
 class Navbar(ctk.CTkFrame):
-    def __init__(self, master, navigate_callback):
-        super().__init__(master, height=60, corner_radius=0)
+    def __init__(self, master, navigate_callback, theme_manager):
+        self.theme_manager = theme_manager
+        super().__init__(master, height=60, corner_radius=0, fg_color=self.theme_manager.get_color("bg_secondary"))
         self.navigate_callback = navigate_callback
         
         # Logo on the left
-        self.logo_label = ctk.CTkLabel(self, text="KontaKT", font=ctk.CTkFont(size=20, weight="bold"))
+        self.logo_label = ctk.CTkLabel(self, text="KontaKT", font=ctk.CTkFont(size=20, weight="bold"), text_color=self.theme_manager.get_color("accent_magenta"))
         self.logo_label.pack(side="left", padx=(20, 30), pady=10)
         
         # Navigation Buttons
@@ -24,7 +25,17 @@ class Navbar(ctk.CTkFrame):
         self.btn_settings = self.create_button("Ustawienia", "settings", right=True)
 
     def create_button(self, text, view_name, right=False):
-        btn = ctk.CTkButton(self, text=text, fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"), command=lambda: self.navigate_callback(view_name))
+        text_color = self.theme_manager.get_color("text_main")
+        hover_color = self.theme_manager.get_color("bg_tertiary")
+        
+        btn = ctk.CTkButton(
+            self, 
+            text=text, 
+            fg_color="transparent", 
+            text_color=text_color, 
+            hover_color=hover_color, 
+            command=lambda: self.navigate_callback(view_name)
+        )
         if right:
             btn.pack(side="right", padx=10, pady=10)
         else:
