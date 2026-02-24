@@ -16,32 +16,32 @@
 
 
 ### Phase 2: Silnik Inteligencji (AI)
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Cel**: Implementacja mechanizmu uczenia się i sugerowania dekretacji.
 **Wymagania**:
-- [ ] Implementacja prostego modelu ML (np. Naive Bayes / TF-IDF + Cosine Similarity) na bazie `scikit-learn`.
-- [ ] Mechanizm "uczenia się" w locie (po zatwierdzeniu dekretacji przez użytkownika, model się aktualizuje).
-- [ ] Wyświetlanie sugestii (Top 3) z procentem pewności.
+- [x] Implementacja prostego modelu ML (np. Naive Bayes / TF-IDF + Cosine Similarity) na bazie `scikit-learn`.
+- [x] Mechanizm "uczenia się" w locie (po zatwierdzeniu dekretacji przez użytkownika, model się aktualizuje).
+- [x] Wyświetlanie sugestii (Top 3) z procentem pewności.
 
 ### Phase 3: Eksport i Raportowanie
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Cel**: Umożliwienie użytkownikowi wykorzystania wyników pracy programu.
 **Wymagania**:
-- [ ] Import Planu Kont z pliku `.xls` (kolumny `WY_KONTO`, `WY_NAZWA`, `KONTO`) z poziomu GUI.
-- [ ] Eksport do PDF (Polecenie Księgowania).
-- [ ] Eksport do Excela (Zestawienie dekretacji).
-- [ ] Historia operacji z możliwością wyszukiwania.
+- [x] Import Planu Kont z pliku `.xls` (kolumny `WY_KONTO`, `WY_NAZWA`, `KONTO`) z poziomu GUI.
+- [x] Eksport do PDF (Polecenie Księgowania).
+- [x] Eksport do Excela (Zestawienie dekretacji).
+- [x] Historia operacji z możliwością wyszukiwania.
 
 ### Phase 4: Optymalizacja Wydajności i Kontrahenci
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Cel**: Przywrócenie płynności aplikacji na dużych zbiorach danych i wgranie bazy kontrahentów.
 **Wymagania**:
-- [ ] Ograniczenie list (Konta, Kontrahenci, Historia) do Top 100 wyników.
-- [ ] Wdrożenie pól szybkiego wyszukiwania (filtrowania) nad listami.
-- [ ] Moduł importu Kontrahentów z Excela (mapowanie kolumn takich jak REGON, NIP, Adres do aktualnego modelu Peewee).
+- [x] Ograniczenie list (Konta, Kontrahenci, Historia) do Top 100 wyników.
+- [x] Wdrożenie pól szybkiego wyszukiwania (filtrowania) nad listami.
+- [x] Moduł importu Kontrahentów z Excela (mapowanie kolumn takich jak REGON, NIP, Adres do aktualnego modelu Peewee).
 
 ### Phase 5: Reorganizacja GUI - Listy Treeview i Interfejs Faktur
-**Status**: ⬜ Not Started
+**Status**: 🏃 In Progress
 **Cel**: Ekstremalna optymalizacja renderowania list całobazowych przy zachowaniu stylistyki oraz usprawnienie doświadczenia z polami wyboru z tysięcy jednostek.
 **Wymagania**:
 - [ ] Przebudowa `AccountsView`, `ContractorsView`, `HistoryView` na wysoce wydajne obiekty `ttk.Treeview` zamiast zagnieżdżonych Labeli CustomTkintera. Zniesienie górnych limitów limit(100).
