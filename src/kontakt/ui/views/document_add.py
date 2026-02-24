@@ -1,4 +1,6 @@
 import threading
+import tkinter as tk
+from tkinter import ttk
 import customtkinter as ctk
 from datetime import date
 from kontakt.database.models import Contractor, Document, Account, DocumentLine
@@ -85,13 +87,40 @@ class DocumentAddView(ctk.CTkFrame):
         self.recent_ma_frame.grid(row=10, column=1, pady=2, sticky="ew", padx=(5,0))
 
         self.load_recent_accounts()
+        
+        # Add / Clone Line Buttons
+        self.btn_frame = ctk.CTkFrame(self.form_frame, fg_color="transparent")
+        self.btn_frame.grid(row=11, column=0, columnspan=2, pady=(10,5), sticky="e")
+        
+        self.btn_add_line = ctk.CTkButton(self.btn_frame, text="Dodaj Pozycję", command=self.add_line_to_queue)
+        self.btn_add_line.pack(side="right", padx=5)
 
-        # Buttons
+        self.btn_clone_line = ctk.CTkButton(self.btn_frame, text="Klonuj Pozycję", fg_color="blue", command=lambda: self.add_line_to_queue(clone=True))
+        self.btn_clone_line.pack(side="right", padx=5)
+
+        # Lines Queue Table (Treeview)
+        self.queue_frame = ctk.CTkFrame(self.form_frame, height=150)
+        self.queue_frame.grid(row=12, column=0, columnspan=2, pady=10, sticky="nsew")
+        self.queue_frame.pack_propagate(False)
+        
+        columns = ("wn", "ma", "amount", "wn_id", "ma_id")
+        self.tree = ttk.Treeview(self.queue_frame, columns=columns, show="headings", height=5)
+        self.tree.heading("wn", text="Konto WN")
+        self.tree.heading("ma", text="Konto MA")
+        self.tree.heading("amount", text="Kwota")
+        self.tree.column("wn", width=150)
+        self.tree.column("ma", width=150)
+        self.tree.column("amount", width=100, anchor="e")
+        self.tree.column("wn_id", width=0, stretch=tk.NO)
+        self.tree.column("ma_id", width=0, stretch=tk.NO)
+        self.tree.pack(fill="both", expand=True)
+        
+        # Final Save Button and Status
         self.btn_save = ctk.CTkButton(self.form_frame, text="Zapisz Dokument", fg_color="green", command=self.save_document)
-        self.btn_save.grid(row=11, column=1, padx=5, pady=20, sticky="e")
+        self.btn_save.grid(row=13, column=1, padx=5, pady=(10, 20), sticky="e")
         
         self.lbl_status = ctk.CTkLabel(self.form_frame, text="")
-        self.lbl_status.grid(row=11, column=0, padx=5, pady=20, sticky="w")
+        self.lbl_status.grid(row=13, column=0, padx=5, pady=(10, 20), sticky="w")
 
 
         # ==== AI Suggestions Frame ====
@@ -266,57 +295,95 @@ class DocumentAddView(ctk.CTkFrame):
         self.btn_wn.configure(text=wn_display)
         self.btn_ma.configure(text=ma_display)
 
+    def add_line_to_queue(self, clone=False):
+        wn_id = self.account_wn_id
+        ma_id = self.account_ma_id
+        amount = self.entry_amount.get().strip()
+
+        if not all([wn_id, ma_id, amount]):
+            self.lbl_status.configure(text="Błąd: Uzupełnij kwotę i oba konta przed dodaniem pozycji.", text_color="red")
+            return
+            
+        wn_display = self.btn_wn.cget("text")
+        ma_display = self.btn_ma.cget("text")
+        
+        try:
+            float_amount = float(amount.replace(',', '.'))
+        except ValueError:
+            self.lbl_status.configure(text="Błąd: Błędny format kwoty.", text_color="red")
+            return
+
+        self.tree.insert("", "end", values=(wn_display, ma_display, f"{float_amount:.2f}", wn_id, ma_id))
+        self.lbl_status.configure(text=f"Dodano pozycję. W kolejce: {len(self.tree.get_children())}", text_color="green")
+        
+        # Clear fields only if not cloning
+        if not clone:
+            self.entry_amount.delete(0, 'end')
+            self.btn_wn.configure(text="Wybierz Konto WN")
+            self.account_wn_id = None
+            self.btn_ma.configure(text="Wybierz Konto MA")
+            self.account_ma_id = None
+
     def save_document(self):
         doc_type = self.combo_type.get()
         number = self.entry_number.get()
         date_issue = self.entry_date.get()
         desc = self.txt_desc.get("1.0", "end-1c").strip()
-        amount = self.entry_amount.get()
         contractor_id = self.contractor_id
-        wn_id = self.account_wn_id
-        ma_id = self.account_ma_id
+        queued_lines = self.tree.get_children()
         
-        if not all([number, date_issue, desc, amount, contractor_id, wn_id, ma_id]):
-            self.lbl_status.configure(text="Błąd: Wypełnij wszystkie pola w tym konta!", text_color="red")
+        if not all([doc_type, number, date_issue, desc, contractor_id]):
+            self.lbl_status.configure(text="Błąd: Wypełnij wszystkie pola w nagłówku!", text_color="red")
+            return
+            
+        if not queued_lines:
+            self.lbl_status.configure(text="Błąd: Brak pozycji dekretacyjnych do zapisu!", text_color="red")
             return
 
         try:
-            # Tworzymy fakturę
+            # Calculate total header amount (sum of all queue lines)
+            total_amount = sum(float(self.tree.item(item, 'values')[2]) for item in queued_lines)
+            
+            # Tworzymy dokument
             document = Document.create(
                 document_type=doc_type,
                 number=number,
                 date_issue=date_issue,
                 description=desc,
-                amount=float(amount.replace(',', '.')),
+                amount=total_amount,
                 contractor_id=contractor_id
             )
             
-            # Tworzymy linię dekretacyjną (to ona jest uzywana do nauki AI)
-            DocumentLine.create(
-                document=document,
-                account_wn_id=wn_id,
-                account_ma_id=ma_id,
-                amount=float(amount.replace(',', '.'))
-            )
+            # Tworzymy linie dekretacyjne
+            for item in queued_lines:
+                values = self.tree.item(item, 'values')
+                DocumentLine.create(
+                    document=document,
+                    account_wn_id=int(values[3]),
+                    account_ma_id=int(values[4]),
+                    amount=float(values[2])
+                )
+                
+            self.lbl_status.configure(text=f"Zapisano Pomyślnie. {doc_type}: {number}. Suma: {total_amount:.2f}", text_color="green")
             
-            self.lbl_status.configure(text="Zapisano poprawnie!", text_color="green")
-            
-            # Doucz model "na żywo" na podstawie nowo wprowadzonego rekordu
+            # Doucz model "na żywo"
             if self.ai_engine:
                 threading.Thread(target=self.ai_engine.train, daemon=True).start()
                 
-            # Czyszczenie forma
-            self.entry_number.delete(0, "end")
+            # Wyczyść powłokę formularza i kolejkę by dodawać następny dokument
+            self.entry_number.delete(0, 'end')
             self.txt_desc.delete("1.0", "end")
-            self.entry_amount.delete(0, "end")
-            self.contractor_id = None
             self.btn_contractor.configure(text="Wybierz Kontrahenta")
-            self.account_wn_id = None
+            self.contractor_id = None
+            self.entry_amount.delete(0, 'end')
             self.btn_wn.configure(text="Wybierz Konto WN")
-            self.account_ma_id = None
+            self.account_wn_id = None
             self.btn_ma.configure(text="Wybierz Konto MA")
+            self.account_ma_id = None
             self.show_ai_placeholder()
             self.load_recent_accounts()
+            for row in queued_lines:
+                self.tree.delete(row)
             
         except Exception as e:
             self.lbl_status.configure(text=f"Błąd zapisu: {e}", text_color="red")
