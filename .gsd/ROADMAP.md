@@ -12,18 +12,4 @@
 
 ## Phases
 
-### Phase 1: Nawigacja i Różne Typy Dokumentów
-**Status**: ✅ Complete
-**Objective**: Wdrożenie paska nawigacyjnego (Navbar) u góry ekranu i reorganizacja widoków. Rozbudowa modelu bazy danych o typy dokumentów (zastąpienie sztywnego `Invoice` uniwersalnym `Document`).
-
-### Phase 2: Poprawki UX - Ergonomia wprowadzania danych
-**Status**: ✅ Complete
-**Objective**: Wdrożenie pamięci ostatnio użytych kont i możliwości kliknięcia aby szybko je wybrać. Wprowadzenie funkcji "Dodaj kolejną pozycję" / powielania wierszy dekretacji. Poprawka konwersji typów w imporcie z Excela (naprawa NIP).
-
-### Phase 3: Moduł Sprzedaży (Kreator Faktur)
-**Status**: ✅ Complete
-**Objective**: Utworzenie okna wystawiania własnych faktur. Dodawanie rzędów asortymentu, liczenie podatku VAT. Stworzenie tabel powiązanych z KSeF (XML) z niezależnym Katalogiem Produktów.
-
-### Phase 4: Integracja KSeF (Eksport XML)
-**Status**: ✅ Complete
-**Objective**: Implementacja mappera i eksportera danych wystawionej faktury na schemat ustrukturyzowany KSeF (XML). Stworzenie panelu Ustawień do parametryzacji stałych danych urzędu (Sprzedawcy).
+*(Wpisz `/new-milestone` aby zaplanować nowe fazy).*
