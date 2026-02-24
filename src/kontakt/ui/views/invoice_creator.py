@@ -4,6 +4,8 @@ import customtkinter as ctk
 from datetime import date
 from kontakt.database.models import Contractor, SalesInvoice, SalesInvoiceItem, ProductCatalog
 from kontakt.ui.components.selection_modal import SelectionModal
+from kontakt.ksef.mapper import KsefMapper
+import tkinter.filedialog as filedialog
 
 class InvoiceCreatorView(ctk.CTkFrame):
     def __init__(self, master):
@@ -136,6 +138,28 @@ class InvoiceCreatorView(ctk.CTkFrame):
         self.btn_save = ctk.CTkButton(self.bottom_frame, text="Wystaw Fakturę", fg_color="green", command=self.save_invoice)
         self.btn_save.pack(side="right", padx=5)
         
+        self.btn_ksef = ctk.CTkButton(self.bottom_frame, text="Eksportuj KSeF (XML)", command=self.export_ksef, state="disabled")
+        self.btn_ksef.pack(side="right", padx=5)
+        
+        self.last_saved_invoice_id = None
+        
+    def export_ksef(self):
+        if not self.last_saved_invoice_id:
+            return
+            
+        filepath = filedialog.asksaveasfilename(
+            defaultextension=".xml",
+            filetypes=[("XML files", "*.xml")],
+            title="Zapisz plik KSeF"
+        )
+        
+        if filepath:
+            try:
+                KsefMapper.generate_xml(self.last_saved_invoice_id, filepath)
+                self.lbl_status.configure(text=f"Wygenerowano KSeF: {filepath}", text_color="green")
+            except Exception as e:
+                self.lbl_status.configure(text=str(e), text_color="red")
+                
     def open_contractor_modal(self):
         def fetch_contractors(phrase):
             all_contractors = Contractor.select().order_by(Contractor.name)
@@ -290,6 +314,8 @@ class InvoiceCreatorView(ctk.CTkFrame):
                 )
                 
             self.lbl_status.configure(text=f"Sukces! Wystawiono Fakturę {number}", text_color="green")
+            self.last_saved_invoice_id = invoice.id
+            self.btn_ksef.configure(state="normal")
             
             # Reset
             self.entry_number.delete(0, 'end')
