@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from customtkinter import filedialog
+from tkinter import ttk
 import os
 import platform
 import subprocess
@@ -31,20 +32,40 @@ class HistoryView(ctk.CTkFrame):
         self.lbl_status = ctk.CTkLabel(self.header_frame, text="")
         self.lbl_status.pack(side="right", padx=10)
 
-        # Columns Header
-        self.cols_frame = ctk.CTkFrame(self)
-        self.cols_frame.grid(row=1, column=0, padx=20, pady=(0,5), sticky="ew")
-        self.cols_frame.grid_columnconfigure((0,1,2,3), weight=1)
-        
-        ctk.CTkLabel(self.cols_frame, text="Data", font=ctk.CTkFont(weight="bold")).grid(row=0, column=0, padx=5, pady=5)
-        ctk.CTkLabel(self.cols_frame, text="Dokument", font=ctk.CTkFont(weight="bold")).grid(row=0, column=1, padx=5, pady=5)
-        ctk.CTkLabel(self.cols_frame, text="Kontrahent", font=ctk.CTkFont(weight="bold")).grid(row=0, column=2, padx=5, pady=5)
-        ctk.CTkLabel(self.cols_frame, text="Kwota", font=ctk.CTkFont(weight="bold")).grid(row=0, column=3, padx=5, pady=5)
-        ctk.CTkLabel(self.cols_frame, text="Akcje", font=ctk.CTkFont(weight="bold")).grid(row=0, column=4, padx=5, pady=5)
+        self.lbl_status.pack(side="right", padx=10)
 
-        # Scrollable List
-        self.scroll_frame = ctk.CTkScrollableFrame(self)
-        self.scroll_frame.grid(row=2, column=0, padx=20, pady=10, sticky="nsew")
+        # Main List Area
+        self.list_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.list_frame.grid(row=1, column=0, padx=20, pady=10, sticky="nsew")
+        self.list_frame.grid_columnconfigure(0, weight=1)
+        self.list_frame.grid_rowconfigure(0, weight=1)
+        
+        columns = ("id", "date", "number", "contractor", "amount")
+        self.tree = ttk.Treeview(self.list_frame, columns=columns, show="headings", selectmode="browse")
+        self.tree.heading("id", text="ID") # Hidden column for logic
+        self.tree.column("id", width=0, stretch=False) # Hide ID column 
+        
+        self.tree.heading("date", text="Data", anchor="w")
+        self.tree.heading("number", text="Dokument", anchor="w")
+        self.tree.heading("contractor", text="Kontrahent", anchor="w")
+        self.tree.heading("amount", text="Kwota", anchor="w")
+        
+        self.tree.column("date", width=100, stretch=False)
+        self.tree.column("number", width=150, stretch=False)
+        self.tree.column("contractor", width=300, stretch=True)
+        self.tree.column("amount", width=100, stretch=False)
+        
+        self.scrollbar = ttk.Scrollbar(self.list_frame, orient="vertical", command=self.tree.yview, style="Vertical.TScrollbar")
+        self.tree.configure(yscrollcommand=self.scrollbar.set)
+        self.tree.grid(row=0, column=0, sticky="nsew")
+        self.scrollbar.grid(row=0, column=1, sticky="ns")
+        
+        # Bottom Actions Frame
+        self.actions_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.actions_frame.grid(row=2, column=0, padx=20, pady=(0, 20), sticky="ew")
+        
+        self.btn_download_pk = ctk.CTkButton(self.actions_frame, text="Pobierz PK (PDF) dla wybranej faktury", command=self.download_selected_pk)
+        self.btn_download_pk.pack(side="left")
 
         self.refresh_list()
 
@@ -52,8 +73,7 @@ class HistoryView(ctk.CTkFrame):
         self.refresh_list()
 
     def refresh_list(self):
-        for widget in self.scroll_frame.winfo_children():
-            widget.destroy()
+        self.tree.delete(*self.tree.get_children())
             
         phrase = self.entry_search.get().strip()
         
@@ -61,22 +81,22 @@ class HistoryView(ctk.CTkFrame):
         if phrase:
             query = query.where(Invoice.number.contains(phrase) | Invoice.description.contains(phrase))
 
-        invoices = query.order_by(Invoice.date_issue.desc()).limit(100)
+        invoices = query.order_by(Invoice.date_issue.desc())
         
         for inv in invoices:
-            row_frame = ctk.CTkFrame(self.scroll_frame, fg_color="transparent")
-            row_frame.pack(fill="x", pady=2)
-            row_frame.grid_columnconfigure((0,1,2,3), weight=1)
+            self.tree.insert("", "end", values=(inv.id, str(inv.date_issue), inv.number, inv.contractor.name, str(inv.amount)))
+
+    def download_selected_pk(self):
+        selected = self.tree.selection()
+        if not selected:
+            self.lbl_status.configure(text="Najpierw wybierz fakturę z listy.", text_color="orange")
+            return
             
-            ctk.CTkLabel(row_frame, text=str(inv.date_issue)).grid(row=0, column=0, padx=5, pady=5)
-            ctk.CTkLabel(row_frame, text=inv.number).grid(row=0, column=1, padx=5, pady=5)
-            ctk.CTkLabel(row_frame, text=inv.contractor.name).grid(row=0, column=2, padx=5, pady=5)
-            ctk.CTkLabel(row_frame, text=str(inv.amount)).grid(row=0, column=3, padx=5, pady=5)
-            
-            # Print PDF btn
-            btn = ctk.CTkButton(row_frame, text="Pobierz PK (PDF)", width=100,
-                                command=lambda i_id=inv.id, i_num=inv.number: self.download_pk(i_id, i_num))
-            btn.grid(row=0, column=4, padx=5, pady=5)
+        item = self.tree.item(selected[0])
+        invoice_id = item['values'][0]
+        number = item['values'][2]
+        
+        self.download_pk(invoice_id, str(number))
 
     def download_pk(self, invoice_id, number):
         safe_num = "".join([c for c in number if c.isalpha() or c.isdigit() or c in " _-"]).rstrip()

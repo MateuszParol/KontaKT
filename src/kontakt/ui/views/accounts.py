@@ -1,6 +1,7 @@
 
 import customtkinter as ctk
 from customtkinter import filedialog
+from tkinter import ttk
 from kontakt.database.models import Account
 from kontakt.services.importer import import_accounts_from_excel
 
@@ -28,9 +29,26 @@ class AccountsView(ctk.CTkFrame):
         self.lbl_import_status = ctk.CTkLabel(self.header_frame, text="")
         self.lbl_import_status.pack(side="right", padx=10)
 
-        # List Area
-        self.scroll_frame = ctk.CTkScrollableFrame(self)
-        self.scroll_frame.grid(row=1, column=0, padx=20, pady=10, sticky="nsew")
+        self.lbl_import_status.pack(side="right", padx=10)
+
+        # List Area (Treeview)
+        self.list_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.list_frame.grid(row=1, column=0, padx=20, pady=10, sticky="nsew")
+        self.list_frame.grid_columnconfigure(0, weight=1)
+        self.list_frame.grid_rowconfigure(0, weight=1)
+        
+        columns = ("symbol", "name")
+        self.tree = ttk.Treeview(self.list_frame, columns=columns, show="headings", selectmode="extended")
+        self.tree.heading("symbol", text="Symbol", anchor="w")
+        self.tree.heading("name", text="Nazwa Konta", anchor="w")
+        self.tree.column("symbol", width=100, minwidth=100, stretch=False)
+        self.tree.column("name", width=400, minwidth=200, stretch=True)
+        
+        self.scrollbar = ttk.Scrollbar(self.list_frame, orient="vertical", command=self.tree.yview, style="Vertical.TScrollbar")
+        self.tree.configure(yscrollcommand=self.scrollbar.set)
+        
+        self.tree.grid(row=0, column=0, sticky="nsew")
+        self.scrollbar.grid(row=0, column=1, sticky="ns")
         
         # Add New Form (Bottom)
         self.form_frame = ctk.CTkFrame(self)
@@ -52,21 +70,19 @@ class AccountsView(ctk.CTkFrame):
 
     def refresh_list(self):
         # Clear list
-        for widget in self.scroll_frame.winfo_children():
-            widget.destroy()
+        self.tree.delete(*self.tree.get_children())
             
         phrase = self.entry_search.get().strip()
             
-        # Fetch accounts with limit 100 for performance
+        # Fetch accounts (no limit to test performance)
         query = Account.select()
         if phrase:
             query = query.where(Account.name.contains(phrase) | Account.symbol.contains(phrase))
         
-        accounts = query.order_by(Account.symbol).limit(100)
+        accounts = query.order_by(Account.symbol)
         
         for acc in accounts:
-            lbl = ctk.CTkLabel(self.scroll_frame, text=f"{acc.symbol} - {acc.name}", anchor="w")
-            lbl.pack(fill="x", padx=5, pady=2)
+            self.tree.insert("", "end", values=(acc.symbol, acc.name))
 
     def add_account(self):
         symbol = self.entry_symbol.get()

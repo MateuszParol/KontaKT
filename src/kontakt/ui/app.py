@@ -6,6 +6,7 @@ from kontakt.ui.views.invoice_add import InvoiceAddView
 from kontakt.ui.views.accounts import AccountsView
 from kontakt.ui.views.contractors import ContractorsView
 import threading
+from tkinter import ttk
 from kontakt.ai.engine import AIEngine
 
 class App(ctk.CTk):
@@ -23,6 +24,29 @@ class App(ctk.CTk):
         # Set theme
         ctk.set_appearance_mode("Dark")
         ctk.set_default_color_theme("blue")
+
+        # Configure scaling and ttk styles for Treeview
+        style = ttk.Style(self)
+        style.theme_use("default")
+        style.configure("Treeview",
+                        background="#2b2b2b",
+                        foreground="white",
+                        rowheight=35,
+                        fieldbackground="#2b2b2b",
+                        bordercolor="#2b2b2b",
+                        borderwidth=0)
+        style.map('Treeview', background=[('selected', '#1f538d')])
+        style.configure("Treeview.Heading",
+                        background="#565b5e",
+                        foreground="white",
+                        relief="flat",
+                        padding=5)
+        style.map("Treeview.Heading",
+                  background=[('active', '#343638')])
+        
+        # Configure Vertical Scrollbar style
+        style.configure("Vertical.TScrollbar", background="#2b2b2b", bordercolor="#2b2b2b", arrowcolor="white", troughcolor="#2b2b2b")
+
 
         # Layout configuration (1x2)
         self.grid_columnconfigure(0, weight=0) # Sidebar fixed

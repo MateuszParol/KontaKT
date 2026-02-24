@@ -1,6 +1,7 @@
 
 import customtkinter as ctk
 from customtkinter import filedialog
+from tkinter import ttk
 from kontakt.database.models import Contractor
 from kontakt.services.importer import import_contractors_from_excel
 
@@ -29,9 +30,26 @@ class ContractorsView(ctk.CTkFrame):
         self.lbl_import_status = ctk.CTkLabel(self.header_frame, text="")
         self.lbl_import_status.pack(side="right", padx=10)
 
-        # List Area
-        self.scroll_frame = ctk.CTkScrollableFrame(self)
-        self.scroll_frame.grid(row=1, column=0, padx=20, pady=10, sticky="nsew")
+        self.lbl_import_status.pack(side="right", padx=10)
+
+        # List Area (Treeview)
+        self.list_frame = ctk.CTkFrame(self, fg_color="transparent")
+        self.list_frame.grid(row=1, column=0, padx=20, pady=10, sticky="nsew")
+        self.list_frame.grid_columnconfigure(0, weight=1)
+        self.list_frame.grid_rowconfigure(0, weight=1)
+        
+        columns = ("nip", "name")
+        self.tree = ttk.Treeview(self.list_frame, columns=columns, show="headings", selectmode="extended")
+        self.tree.heading("nip", text="NIP", anchor="w")
+        self.tree.heading("name", text="Nazwa Firmy", anchor="w")
+        self.tree.column("nip", width=150, minwidth=100, stretch=False)
+        self.tree.column("name", width=350, minwidth=200, stretch=True)
+        
+        self.scrollbar = ttk.Scrollbar(self.list_frame, orient="vertical", command=self.tree.yview, style="Vertical.TScrollbar")
+        self.tree.configure(yscrollcommand=self.scrollbar.set)
+        
+        self.tree.grid(row=0, column=0, sticky="nsew")
+        self.scrollbar.grid(row=0, column=1, sticky="ns")
         
         # Add New Form
         self.form_frame = ctk.CTkFrame(self)
@@ -52,8 +70,7 @@ class ContractorsView(ctk.CTkFrame):
         self.refresh_list()
 
     def refresh_list(self):
-        for widget in self.scroll_frame.winfo_children():
-            widget.destroy()
+        self.tree.delete(*self.tree.get_children())
             
         phrase = self.entry_search.get().strip()
         
@@ -61,10 +78,9 @@ class ContractorsView(ctk.CTkFrame):
         if phrase:
             query = query.where(Contractor.name.contains(phrase) | Contractor.nip.contains(phrase))
 
-        contractors = query.order_by(Contractor.name).limit(100)
+        contractors = query.order_by(Contractor.name)
         for c in contractors:
-            lbl = ctk.CTkLabel(self.scroll_frame, text=f"{c.name} (NIP: {c.nip or '-'})", anchor="w")
-            lbl.pack(fill="x", padx=5, pady=2)
+            self.tree.insert("", "end", values=(c.nip or '-', c.name))
 
     def add_contractor(self):
         nip = self.entry_nip.get()
