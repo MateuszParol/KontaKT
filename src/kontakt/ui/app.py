@@ -87,6 +87,10 @@ class App(ctk.CTk):
         elif view_name == "contractors":
             view = ContractorsView(self.content_frame)
             view.pack(fill="both", expand=True)
+        elif view_name == "settings":
+            from kontakt.ui.views.settings import SettingsView
+            view = SettingsView(self.content_frame)
+            view.pack(fill="both", expand=True)
         else:
             # Placeholder
             lbl = ctk.CTkLabel(self.content_frame, text=f"Widok: {view_name} (W budowie)", font=("Roboto", 24))

@@ -55,3 +55,7 @@ class SalesInvoiceItem(BaseModel):
     vat_rate = CharField()
     total_net = DecimalField(max_digits=10, decimal_places=2)
     total_gross = DecimalField(max_digits=10, decimal_places=2)
+
+class Settings(BaseModel):
+    key = CharField(unique=True)
+    value = TextField(null=True)
