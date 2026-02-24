@@ -2,6 +2,7 @@ import threading
 import customtkinter as ctk
 from datetime import date
 from kontakt.database.models import Contractor, Invoice, Account, InvoiceLine
+from kontakt.ui.components.selection_modal import SelectionModal
 
 class InvoiceAddView(ctk.CTkFrame):
     def __init__(self, master, ai_engine=None):
@@ -37,10 +38,9 @@ class InvoiceAddView(ctk.CTkFrame):
         self.lbl_contractor = ctk.CTkLabel(self.form_frame, text="Kontrahent:")
         self.lbl_contractor.grid(row=2, column=0, columnspan=2, padx=5, pady=5, sticky="w")
         
-        self.contractors_map = {} 
-        self.combo_contractor = ctk.CTkComboBox(self.form_frame, values=[])
-        self.combo_contractor.grid(row=3, column=0, columnspan=2, padx=5, pady=5, sticky="ew")
-        self.refresh_contractors()
+        self.contractor_id = None
+        self.btn_contractor = ctk.CTkButton(self.form_frame, text="Wybierz Kontrahenta", fg_color="transparent", border_width=1, text_color=("gray10", "gray90"), anchor="w", command=self.open_contractor_modal)
+        self.btn_contractor.grid(row=3, column=0, columnspan=2, padx=5, pady=5, sticky="ew")
 
         # Opis
         self.lbl_desc = ctk.CTkLabel(self.form_frame, text="Opis zdarzenia (dla AI):")
@@ -61,16 +61,14 @@ class InvoiceAddView(ctk.CTkFrame):
         self.lbl_accounts = ctk.CTkLabel(self.form_frame, text="Dekretacja (Konto WN / Konto MA):")
         self.lbl_accounts.grid(row=8, column=0, columnspan=2, pady=(20,0), sticky="w")
         
-        self.accounts_map = {} # Display string -> ID
-        self.accounts_id_to_symbol = {}
+        self.account_wn_id = None
+        self.account_ma_id = None
         
-        self.combo_wn = ctk.CTkComboBox(self.form_frame, values=["Wybierz Konto WN"])
-        self.combo_wn.grid(row=9, column=0, pady=5, sticky="ew", padx=(0,5))
+        self.btn_wn = ctk.CTkButton(self.form_frame, text="Wybierz Konto WN", fg_color="transparent", border_width=1, text_color=("gray10", "gray90"), anchor="w", command=lambda: self.open_account_modal("wn"))
+        self.btn_wn.grid(row=9, column=0, pady=5, sticky="ew", padx=(0,5))
         
-        self.combo_ma = ctk.CTkComboBox(self.form_frame, values=["Wybierz Konto MA"])
-        self.combo_ma.grid(row=9, column=1, pady=5, sticky="ew", padx=(5,0))
-        
-        self.refresh_accounts()
+        self.btn_ma = ctk.CTkButton(self.form_frame, text="Wybierz Konto MA", fg_color="transparent", border_width=1, text_color=("gray10", "gray90"), anchor="w", command=lambda: self.open_account_modal("ma"))
+        self.btn_ma.grid(row=9, column=1, pady=5, sticky="ew", padx=(5,0))
 
         # Buttons
         self.btn_save = ctk.CTkButton(self.form_frame, text="Zapisz Fakturę", fg_color="green", command=self.save_invoice)
@@ -98,38 +96,47 @@ class InvoiceAddView(ctk.CTkFrame):
         lbl = ctk.CTkLabel(self.ai_content, text=text, text_color="gray")
         lbl.pack(pady=20)
 
-    def refresh_contractors(self):
-        self.contractors_map = {}
-        values = []
-        for c in Contractor.select().order_by(Contractor.name):
-            self.contractors_map[c.name] = c.id
-            values.append(c.name)
-        
-        if not values:
-            values = ["Brak kontrahentów - dodaj w zakładce Kontrahenci"]
+    def open_contractor_modal(self):
+        def fetch_contractors(phrase):
+            query = Contractor.select()
+            if phrase:
+                query = query.where(Contractor.name.contains(phrase) | Contractor.nip.contains(phrase))
+            return [(c.id, c.nip or "-", c.name) for c in query.order_by(Contractor.name)]
             
-        self.combo_contractor.configure(values=values)
-        if values:
-            self.combo_contractor.set(values[0])
+        def on_select(values):
+            self.contractor_id = int(values[0])
+            self.btn_contractor.configure(text=values[2])
+            
+        SelectionModal(
+            self,
+            title="Wybierz Kontrahenta",
+            columns=[("id", "ID", 0), ("nip", "NIP", 100), ("name", "Nazwa", 400)],
+            data_fetcher=fetch_contractors,
+            on_select=on_select
+        )
 
-    def refresh_accounts(self):
-        self.accounts_map = {}
-        self.accounts_id_to_symbol = {}
-        values = []
-        for a in Account.select().order_by(Account.symbol):
-            display = f"{a.symbol} - {a.name}"
-            self.accounts_map[display] = a.id
-            self.accounts_id_to_symbol[a.id] = display
-            values.append(display)
+    def open_account_modal(self, acc_type):
+        def fetch_accounts(phrase):
+            query = Account.select()
+            if phrase:
+                query = query.where(Account.name.contains(phrase) | Account.symbol.contains(phrase))
+            return [(a.id, a.symbol, a.name) for a in query.order_by(Account.symbol)]
             
-        if not values:
-            values = ["Brak kont"]
-            
-        self.combo_wn.configure(values=values)
-        self.combo_ma.configure(values=values)
-        if values:
-            self.combo_wn.set(values[0])
-            self.combo_ma.set(values[0])
+        def on_select(values):
+            if acc_type == "wn":
+                self.account_wn_id = int(values[0])
+                self.btn_wn.configure(text=f"{values[1]} - {values[2]}")
+            else:
+                self.account_ma_id = int(values[0])
+                self.btn_ma.configure(text=f"{values[1]} - {values[2]}")
+                
+        SelectionModal(
+            self,
+            title=f"Wybierz Konto {'WN' if acc_type == 'wn' else 'MA'}",
+            columns=[("id", "ID", 0), ("symbol", "Symbol", 100), ("name", "Nazwa", 400)],
+            data_fetcher=fetch_accounts,
+            on_select=on_select
+        )
 
     def request_ai_suggestions(self, event=None):
         if not self.ai_engine:
@@ -157,9 +164,16 @@ class InvoiceAddView(ctk.CTkFrame):
             return
             
         for idx, res in enumerate(results):
-            wn_display = self.accounts_id_to_symbol.get(res["account_wn_id"], "Nieznane")
-            ma_display = self.accounts_id_to_symbol.get(res["account_ma_id"], "Nieznane")
+            wn_account = Account.get_or_none(Account.id == res["account_wn_id"])
+            ma_account = Account.get_or_none(Account.id == res["account_ma_id"])
+            
+            wn_display = f"{wn_account.symbol} - {wn_account.name}" if wn_account else "Nieznane"
+            ma_display = f"{ma_account.symbol} - {ma_account.name}" if ma_account else "Nieznane"
             match = res["match_percent"]
+            
+            # Use IDs for applying the suggestion
+            wn_id = res["account_wn_id"]
+            ma_id = res["account_ma_id"]
             
             f = ctk.CTkFrame(self.ai_content)
             f.pack(fill="x", pady=5)
@@ -170,30 +184,27 @@ class InvoiceAddView(ctk.CTkFrame):
             
             # Apply suggestion button
             btn = ctk.CTkButton(f, text="Wybierz", width=60, height=24,
-                                command=lambda w=wn_display, m=ma_display: self.apply_ai_suggestion(w, m))
+                                command=lambda w_id=wn_id, m_id=ma_id, w_disp=wn_display, m_disp=ma_display: self.apply_ai_suggestion(w_id, m_id, w_disp, m_disp))
             btn.pack(side="right", padx=10, pady=10)
             
             # Auto-select if confident and it's the first result
             if idx == 0 and match > 80.0:
-                self.apply_ai_suggestion(wn_display, ma_display)
+                self.apply_ai_suggestion(wn_id, ma_id, wn_display, ma_display)
                 
-    def apply_ai_suggestion(self, wn_display, ma_display):
-        self.combo_wn.set(wn_display)
-        self.combo_ma.set(ma_display)
+    def apply_ai_suggestion(self, wn_id, ma_id, wn_display, ma_display):
+        self.account_wn_id = wn_id
+        self.account_ma_id = ma_id
+        self.btn_wn.configure(text=wn_display)
+        self.btn_ma.configure(text=ma_display)
 
     def save_invoice(self):
         number = self.entry_number.get()
         date_issue = self.entry_date.get()
         desc = self.txt_desc.get("1.0", "end-1c").strip()
         amount = self.entry_amount.get()
-        contractor_name = self.combo_contractor.get()
-        
-        wn_val = self.combo_wn.get()
-        ma_val = self.combo_ma.get()
-        
-        contractor_id = self.contractors_map.get(contractor_name)
-        wn_id = self.accounts_map.get(wn_val)
-        ma_id = self.accounts_map.get(ma_val)
+        contractor_id = self.contractor_id
+        wn_id = self.account_wn_id
+        ma_id = self.account_ma_id
         
         if not all([number, date_issue, desc, amount, contractor_id, wn_id, ma_id]):
             self.lbl_status.configure(text="Błąd: Wypełnij wszystkie pola w tym konta!", text_color="red")
@@ -227,6 +238,12 @@ class InvoiceAddView(ctk.CTkFrame):
             self.entry_number.delete(0, "end")
             self.txt_desc.delete("1.0", "end")
             self.entry_amount.delete(0, "end")
+            self.contractor_id = None
+            self.btn_contractor.configure(text="Wybierz Kontrahenta")
+            self.account_wn_id = None
+            self.btn_wn.configure(text="Wybierz Konto WN")
+            self.account_ma_id = None
+            self.btn_ma.configure(text="Wybierz Konto MA")
             self.show_ai_placeholder()
             
         except Exception as e:
