@@ -1,12 +1,12 @@
 ---
-status: planning
+status: complete
 milestone: v2.0
-phase: 5
+phase: 4
 ---
 
 # Current Status
 
 **Active Milestone:** v2.0 - Rozbudowa i KSeF
-**Active Phase:** 5 (Planowanie)
-**Last Action:** Zakończono Fazę 4. Wdrożono zakładkę Ustawienia (stałe dane urzędu) oraz opcję wygenerowania i zapisu faktury jako plik `xml` w formacie KSeF FA(2).
-**Waiting For:** Zakończyliśmy Milestone v2.0 wraz ze zrealizowaniem prac nad KSeF. Użytkownik musi wybrać kolejny kierunek działań (np. `Top 100` lub nowa faza z ROADMAP.md - `/plan 5`).
+**Active Phase:** All complete
+**Last Action:** Zakończono Fazę 4. Oznaczono Fazę 1 jako ukończoną w ROADMAP.md. Milestone 2.0 osiągnięty.
+**Waiting For:** Uruchomienie procedury `/complete-milestone` celem archiwizacji, a następnie zaplanowanie kolejnych działań komendą `/new-milestone`.

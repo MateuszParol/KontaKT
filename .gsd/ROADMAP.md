@@ -13,7 +13,7 @@
 ## Phases
 
 ### Phase 1: Nawigacja i Różne Typy Dokumentów
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Wdrożenie paska nawigacyjnego (Navbar) u góry ekranu i reorganizacja widoków. Rozbudowa modelu bazy danych o typy dokumentów (zastąpienie sztywnego `Invoice` uniwersalnym `Document`).
 
 ### Phase 2: Poprawki UX - Ergonomia wprowadzania danych
