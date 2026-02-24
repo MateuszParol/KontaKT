@@ -77,12 +77,21 @@ class DocumentAddView(ctk.CTkFrame):
         self.btn_ma = ctk.CTkButton(self.form_frame, text="Wybierz Konto MA", fg_color="transparent", border_width=1, text_color=("gray10", "gray90"), anchor="w", command=lambda: self.open_account_modal("ma"))
         self.btn_ma.grid(row=9, column=1, pady=5, sticky="ew", padx=(5,0))
 
+        # Recent accounts memory frames
+        self.recent_wn_frame = ctk.CTkFrame(self.form_frame, fg_color="transparent")
+        self.recent_wn_frame.grid(row=10, column=0, pady=2, sticky="ew", padx=(0,5))
+        
+        self.recent_ma_frame = ctk.CTkFrame(self.form_frame, fg_color="transparent")
+        self.recent_ma_frame.grid(row=10, column=1, pady=2, sticky="ew", padx=(5,0))
+
+        self.load_recent_accounts()
+
         # Buttons
         self.btn_save = ctk.CTkButton(self.form_frame, text="Zapisz Dokument", fg_color="green", command=self.save_document)
-        self.btn_save.grid(row=10, column=1, padx=5, pady=20, sticky="e")
+        self.btn_save.grid(row=11, column=1, padx=5, pady=20, sticky="e")
         
         self.lbl_status = ctk.CTkLabel(self.form_frame, text="")
-        self.lbl_status.grid(row=10, column=0, padx=5, pady=20, sticky="w")
+        self.lbl_status.grid(row=11, column=0, padx=5, pady=20, sticky="w")
 
 
         # ==== AI Suggestions Frame ====
@@ -96,6 +105,43 @@ class DocumentAddView(ctk.CTkFrame):
         self.ai_content.pack(fill="both", expand=True, padx=10, pady=5)
         
         self.show_ai_placeholder()
+
+    def load_recent_accounts(self):
+        # Clear existing buttons
+        for widget in self.recent_wn_frame.winfo_children():
+            widget.destroy()
+        for widget in self.recent_ma_frame.winfo_children():
+            widget.destroy()
+            
+        recent_wn_ids = []
+        recent_ma_ids = []
+        
+        # Get latest distinct WN
+        lines_wn = DocumentLine.select(DocumentLine.account_wn_id).group_by(DocumentLine.account_wn_id).order_by(DocumentLine.id.desc()).limit(5)
+        recent_wn_ids = [line.account_wn_id for line in lines_wn if line.account_wn_id]
+        
+        # Get latest distinct MA
+        lines_ma = DocumentLine.select(DocumentLine.account_ma_id).group_by(DocumentLine.account_ma_id).order_by(DocumentLine.id.desc()).limit(5)
+        recent_ma_ids = [line.account_ma_id for line in lines_ma if line.account_ma_id]
+        
+        def create_recent_btns(parent, account_ids, acc_type):
+            for acc_id in account_ids:
+                acc = Account.get_or_none(Account.id == acc_id)
+                if acc:
+                    btn = ctk.CTkButton(parent, text=acc.symbol, width=40, font=ctk.CTkFont(size=10), 
+                                        command=lambda a_id=acc.id, a_sym=acc.symbol, a_name=acc.name: self.apply_quick_account(acc_type, a_id, a_sym, a_name))
+                    btn.pack(side="left", padx=2)
+
+        create_recent_btns(self.recent_wn_frame, recent_wn_ids, "wn")
+        create_recent_btns(self.recent_ma_frame, recent_ma_ids, "ma")
+
+    def apply_quick_account(self, acc_type, acc_id, symbol, name):
+        if acc_type == "wn":
+            self.account_wn_id = acc_id
+            self.btn_wn.configure(text=f"{symbol} - {name}")
+        else:
+            self.account_ma_id = acc_id
+            self.btn_ma.configure(text=f"{symbol} - {name}")
 
     def show_ai_placeholder(self, text="Wprowadź opis i odznacz pole,\naby otrzymać sugestie dektretacji."):
         for widget in self.ai_content.winfo_children():
@@ -270,6 +316,7 @@ class DocumentAddView(ctk.CTkFrame):
             self.account_ma_id = None
             self.btn_ma.configure(text="Wybierz Konto MA")
             self.show_ai_placeholder()
+            self.load_recent_accounts()
             
         except Exception as e:
             self.lbl_status.configure(text=f"Błąd zapisu: {e}", text_color="red")
