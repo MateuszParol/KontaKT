@@ -10,7 +10,7 @@ class Navbar(ctk.CTkFrame):
         self.logo_label.pack(side="left", padx=(20, 30), pady=10)
         
         # Navigation Buttons
-        self.btn_new = self.create_button("Dokumenty", "invoice_add")
+        self.btn_new = self.create_button("Dokumenty", "document_add")
         self.btn_history = self.create_button("Historia", "history")
         self.btn_accounts = self.create_button("Plan Kont", "accounts")
         self.btn_contractors = self.create_button("Kontrahenci", "contractors")

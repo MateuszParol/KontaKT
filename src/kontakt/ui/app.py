@@ -2,7 +2,7 @@
 import customtkinter as ctk
 from kontakt import config
 from kontakt.ui.views.navbar import Navbar
-from kontakt.ui.views.invoice_add import InvoiceAddView
+from kontakt.ui.views.document_add import DocumentAddView
 from kontakt.ui.views.accounts import AccountsView
 from kontakt.ui.views.contractors import ContractorsView
 import threading
@@ -62,7 +62,7 @@ class App(ctk.CTk):
         self.content_frame.grid(row=1, column=0, sticky="nsew")
 
         # Init default view
-        self.show_view("invoice_add")
+        self.show_view("document_add")
 
     def show_view(self, view_name):
         # Hide/Destroy current content
@@ -70,8 +70,8 @@ class App(ctk.CTk):
             widget.destroy()
 
         # Show new view
-        if view_name == "invoice_add":
-            view = InvoiceAddView(self.content_frame, ai_engine=self.ai_engine)
+        if view_name == "document_add":
+            view = DocumentAddView(self.content_frame, ai_engine=self.ai_engine)
             view.pack(fill="both", expand=True)
         elif view_name == "history":
             from kontakt.ui.views.history import HistoryView

@@ -4,7 +4,7 @@ from datetime import date
 from kontakt.database.models import Contractor, Document, Account, DocumentLine
 from kontakt.ui.components.selection_modal import SelectionModal
 
-class InvoiceAddView(ctk.CTkFrame):
+class DocumentAddView(ctk.CTkFrame):
     def __init__(self, master, ai_engine=None):
         super().__init__(master, corner_radius=0, fg_color="transparent")
         self.ai_engine = ai_engine
@@ -14,33 +14,40 @@ class InvoiceAddView(ctk.CTkFrame):
         self.grid_rowconfigure(1, weight=1)
         
         # Header
-        self.header = ctk.CTkLabel(self, text="Nowa Faktura", font=ctk.CTkFont(size=24, weight="bold"))
+        self.header = ctk.CTkLabel(self, text="Nowy Dokument", font=ctk.CTkFont(size=24, weight="bold"))
         self.header.grid(row=0, column=0, columnspan=2, padx=20, pady=20, sticky="w")
         
         # ==== Form Frame ====
         self.form_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.form_frame.grid(row=1, column=0, sticky="nsew", padx=(20,10))
         
-        # Numer Faktury
-        self.lbl_number = ctk.CTkLabel(self.form_frame, text="Numer Faktury:")
-        self.lbl_number.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+        # Typ Dokumentu
+        self.lbl_type = ctk.CTkLabel(self.form_frame, text="Typ Dokumentu:")
+        self.lbl_type.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+        self.combo_type = ctk.CTkComboBox(self.form_frame, values=["Faktura", "Wyciąg", "Nota"], state="readonly")
+        self.combo_type.grid(row=1, column=0, padx=5, pady=5, sticky="ew")
+        self.combo_type.set("Faktura")
+
+        # Numer Dokumentu
+        self.lbl_number = ctk.CTkLabel(self.form_frame, text="Numer Dokumentu:")
+        self.lbl_number.grid(row=0, column=1, padx=5, pady=5, sticky="w")
         self.entry_number = ctk.CTkEntry(self.form_frame, placeholder_text="FV/2023/...")
-        self.entry_number.grid(row=1, column=0, padx=5, pady=5, sticky="ew")
+        self.entry_number.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
 
         # Data Wystawienia
         self.lbl_date = ctk.CTkLabel(self.form_frame, text="Data Wystawienia (RRRR-MM-DD):")
-        self.lbl_date.grid(row=0, column=1, padx=5, pady=5, sticky="w")
+        self.lbl_date.grid(row=2, column=0, padx=5, pady=5, sticky="w")
         self.entry_date = ctk.CTkEntry(self.form_frame, placeholder_text=str(date.today()))
-        self.entry_date.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
+        self.entry_date.grid(row=3, column=0, padx=5, pady=5, sticky="ew")
         self.entry_date.insert(0, str(date.today()))
 
         # Kontrahent
         self.lbl_contractor = ctk.CTkLabel(self.form_frame, text="Kontrahent:")
-        self.lbl_contractor.grid(row=2, column=0, columnspan=2, padx=5, pady=5, sticky="w")
+        self.lbl_contractor.grid(row=2, column=1, padx=5, pady=5, sticky="w")
         
         self.contractor_id = None
         self.btn_contractor = ctk.CTkButton(self.form_frame, text="Wybierz Kontrahenta", fg_color="transparent", border_width=1, text_color=("gray10", "gray90"), anchor="w", command=self.open_contractor_modal)
-        self.btn_contractor.grid(row=3, column=0, columnspan=2, padx=5, pady=5, sticky="ew")
+        self.btn_contractor.grid(row=3, column=1, padx=5, pady=5, sticky="ew")
 
         # Opis
         self.lbl_desc = ctk.CTkLabel(self.form_frame, text="Opis zdarzenia (dla AI):")
@@ -71,7 +78,7 @@ class InvoiceAddView(ctk.CTkFrame):
         self.btn_ma.grid(row=9, column=1, pady=5, sticky="ew", padx=(5,0))
 
         # Buttons
-        self.btn_save = ctk.CTkButton(self.form_frame, text="Zapisz Fakturę", fg_color="green", command=self.save_invoice)
+        self.btn_save = ctk.CTkButton(self.form_frame, text="Zapisz Dokument", fg_color="green", command=self.save_document)
         self.btn_save.grid(row=10, column=1, padx=5, pady=20, sticky="e")
         
         self.lbl_status = ctk.CTkLabel(self.form_frame, text="")
@@ -197,7 +204,8 @@ class InvoiceAddView(ctk.CTkFrame):
         self.btn_wn.configure(text=wn_display)
         self.btn_ma.configure(text=ma_display)
 
-    def save_invoice(self):
+    def save_document(self):
+        doc_type = self.combo_type.get()
         number = self.entry_number.get()
         date_issue = self.entry_date.get()
         desc = self.txt_desc.get("1.0", "end-1c").strip()
@@ -213,7 +221,7 @@ class InvoiceAddView(ctk.CTkFrame):
         try:
             # Tworzymy fakturę
             document = Document.create(
-                document_type="Faktura",
+                document_type=doc_type,
                 number=number,
                 date_issue=date_issue,
                 description=desc,

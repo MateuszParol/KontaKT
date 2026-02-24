@@ -40,19 +40,21 @@ class HistoryView(ctk.CTkFrame):
         self.list_frame.grid_columnconfigure(0, weight=1)
         self.list_frame.grid_rowconfigure(0, weight=1)
         
-        columns = ("id", "date", "number", "contractor", "amount")
+        columns = ("id", "type", "date", "number", "contractor", "amount")
         self.tree = ttk.Treeview(self.list_frame, columns=columns, show="headings", selectmode="browse")
         self.tree.heading("id", text="ID") # Hidden column for logic
         self.tree.column("id", width=0, stretch=False) # Hide ID column 
         
+        self.tree.heading("type", text="Typ", anchor="w")
         self.tree.heading("date", text="Data", anchor="w")
         self.tree.heading("number", text="Dokument", anchor="w")
         self.tree.heading("contractor", text="Kontrahent", anchor="w")
         self.tree.heading("amount", text="Kwota", anchor="w")
         
+        self.tree.column("type", width=80, stretch=False)
         self.tree.column("date", width=100, stretch=False)
         self.tree.column("number", width=150, stretch=False)
-        self.tree.column("contractor", width=300, stretch=True)
+        self.tree.column("contractor", width=220, stretch=True)
         self.tree.column("amount", width=100, stretch=False)
         
         self.scrollbar = ttk.Scrollbar(self.list_frame, orient="vertical", command=self.tree.yview, style="Vertical.TScrollbar")
@@ -79,12 +81,12 @@ class HistoryView(ctk.CTkFrame):
         
         query = Document.select()
         if phrase:
-            query = query.where(Document.number.contains(phrase) | Document.description.contains(phrase))
+            query = query.where(Document.number.contains(phrase) | Document.description.contains(phrase) | Document.document_type.contains(phrase))
 
         invoices = query.order_by(Document.date_issue.desc())
         
         for inv in invoices:
-            self.tree.insert("", "end", values=(inv.id, str(inv.date_issue), inv.number, inv.contractor.name, str(inv.amount)))
+            self.tree.insert("", "end", values=(inv.id, inv.document_type, str(inv.date_issue), inv.number, inv.contractor.name, str(inv.amount)))
 
     def download_selected_pk(self):
         selected = self.tree.selection()
@@ -94,7 +96,7 @@ class HistoryView(ctk.CTkFrame):
             
         item = self.tree.item(selected[0])
         invoice_id = item['values'][0]
-        number = item['values'][2]
+        number = item['values'][3]
         
         self.download_pk(invoice_id, str(number))
 
