@@ -17,7 +17,7 @@
 **Objective**: Wdrożenie centralnego menedżera Themingu dla CustomTkinter. Zaprojektowanie palety Tokyo Night (Dark) oraz kompatybilnego motywu Light. Przełączenie głównych kontenerów na nowe kolory.
 
 ### Phase 2: Animowane Przejścia i Toggle
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Stworzenie niestandardowego przełącznika Light/Dark. Zaimplementowanie animacji "wylewającego się z rogu" gradientu/koloru dla płynnego i satysfakcjonującego przejścia między motywami (wymaga zabawy z warstwami `Canvas` tkinera).
 
 ### Phase 3: Pływające Tło i Efekty Wizualne

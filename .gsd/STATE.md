@@ -1,12 +1,12 @@
 ---
-status: planned
+status: planning
 milestone: v3.0
-phase: 2
+phase: 3
 ---
 
 # Current Status
 
 **Active Milestone:** v3.0 - Design & UI Overhaul
-**Active Phase:** 2 (Planowanie ukończone)
-**Last Action:** Zakończono planowanie Fazy 2. Stworzono pliki wykonawcze `2.1-PLAN.md` oraz `2.2-PLAN.md` definiujące nową kontrolkę w Navbarze i logikę animacji na Canvasie.
-**Waiting For:** Użytkownik musi wywołać `/execute 2` by przystąpić do prac programistycznych nad animowanym motywem Tokio Night.
+**Active Phase:** 3 (Planowanie)
+**Last Action:** Zakończono Fazę 2 (Animowane Przejście Modalne). Stworzono płynny rozszerzający się Canvas Toggle. Użytkownik zostanie powiadomiony.
+**Waiting For:** Komenda `/plan 3` aby przygotować pływające, interaktywne cząsteczki / efekty wizualne pustej przestrzeni.
