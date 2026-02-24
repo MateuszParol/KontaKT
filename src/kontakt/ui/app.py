@@ -106,5 +106,101 @@ class App(ctk.CTk):
 
     def _on_theme_toggle(self, x, y):
         # Callback from Navbar when the theme button is clicked.
-        # For now, just print the event so we know things are wired up.
-        print(f"Theme toggled at X:{x} Y:{y}")
+        self.animate_theme_toggle(x, y)
+        
+    def animate_theme_toggle(self, start_x, start_y):
+        # Calculate start coordinates relative to the window
+        # winfo_rootx() is screen coord, winfo_x() is relative to parent. 
+        # But we need relative to App window.
+        rel_x = start_x - self.winfo_rootx()
+        rel_y = start_y - self.winfo_rooty()
+        
+        # Determine target color for the animation
+        target_color = self.theme_manager.get_color("bg_main")
+        
+        # Create a top-level canvas
+        import tkinter as tk
+        canvas = tk.Canvas(self, bg=self.cget("bg"), highlightthickness=0)
+        canvas.place(relx=0, rely=0, relwidth=1, relheight=1)
+        
+        # We need the canvas to let clicks pass through or just block temporarily?
+        # A 800ms block is fine.
+        
+        radius = 1
+        max_radius = ((self.winfo_width() ** 2) + (self.winfo_height() ** 2)) ** 0.5
+        
+        # Draw initial circle
+        circle_id = canvas.create_oval(
+            rel_x - radius, rel_y - radius, 
+            rel_x + radius, rel_y + radius, 
+            fill=target_color, outline=target_color
+        )
+        
+        def _animate_step():
+            nonlocal radius
+            radius += max(15, radius * 0.15) # Exponential growth
+            
+            canvas.coords(
+                circle_id, 
+                rel_x - radius, rel_y - radius, 
+                rel_x + radius, rel_y + radius
+            )
+            
+            if radius < max_radius:
+                self.after(16, _animate_step) # ~60fps
+            else:
+                self._apply_theme_colors()
+                canvas.destroy()
+                
+        _animate_step()
+        
+    def _apply_theme_colors(self):
+        # Change main app background
+        self.configure(fg_color=self.theme_manager.get_color("bg_main"))
+        self.content_frame.configure(fg_color=self.theme_manager.get_color("bg_main"))
+        
+        # Refresh Navbar
+        self.navbar.configure(fg_color=self.theme_manager.get_color("bg_secondary"))
+        self.navbar.logo_label.configure(text_color=self.theme_manager.get_color("accent_magenta"))
+        for widget in self.navbar.winfo_children():
+            if isinstance(widget, ctk.CTkButton):
+                widget.configure(
+                    text_color=self.theme_manager.get_color("text_main"),
+                    hover_color=self.theme_manager.get_color("bg_tertiary")
+                )
+        
+        # Refresh current view
+        # A simple wipe and recreate might be easiest, or we can just re-show it.
+        # But `show_view` destroys state. We really need a `refresh_theme` on views.
+        # For MVP of the visual overhaul, we'll try to just update standard elements.
+        for widget in self.content_frame.winfo_children():
+            if hasattr(widget, 'refresh_theme'):
+                widget.refresh_theme(self.theme_manager)
+            else:
+                # Basic fallback to repaint Background frames if they are ctk frames
+                if isinstance(widget, ctk.CTkFrame):
+                    widget.configure(fg_color=self.theme_manager.get_color("bg_main"))
+                    for child in widget.winfo_children():
+                         if isinstance(child, ctk.CTkFrame):
+                             child.configure(fg_color=self.theme_manager.get_color("bg_main"))
+
+        # Re-apply styles to Treeview
+        # ...
+        bg_secondary = self.theme_manager.get_color("bg_secondary")
+        bg_tertiary = self.theme_manager.get_color("bg_tertiary")
+        text_main = self.theme_manager.get_color("text_main")
+        accent_blue = self.theme_manager.get_color("accent_blue")
+        
+        style = ttk.Style(self)
+        style.configure("Treeview",
+                        background=bg_secondary,
+                        foreground=text_main,
+                        fieldbackground=bg_secondary,
+                        bordercolor=bg_secondary)
+        style.map('Treeview', background=[('selected', accent_blue)])
+        style.configure("Treeview.Heading",
+                        background=bg_tertiary,
+                        foreground=text_main)
+        style.map("Treeview.Heading",
+                  background=[('active', self.theme_manager.get_color("accent_magenta"))])
+        style.configure("Vertical.TScrollbar", background=bg_secondary, bordercolor=bg_secondary, arrowcolor=text_main, troughcolor=bg_secondary)
