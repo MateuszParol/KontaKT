@@ -1,10 +1,14 @@
 ## Current Position
 - **Milestone**: v2.0 (Rozbudowa i KSeF)
-- **Phase**: Not started
-- **Status**: Milestone planned
+- **Phase**: 1
+- **Task**: Planning complete
+- **Status**: Ready for execution
 
 ## Last Session Summary
-Created Milestone v2.0 based on user requirements. Prioritized UX/UI improvements, multi-document support, and structured invoicing (KSeF).
+Drafted execution plans for Phase 1 (Nawigacja i Różne Typy Dokumentów):
+- **1.1-PLAN.md**: Database Schema Refactor (`Invoice` -> `Document`)
+- **1.2-PLAN.md**: `Navbar` implementation replacing `Sidebar`
+- **1.3-PLAN.md**: UI Genericization (`InvoiceAddView` -> `DocumentAddView`)
 
 ## Next Steps
-1. /plan 1 — Create Phase 1 execution plans
+1. /execute 1
