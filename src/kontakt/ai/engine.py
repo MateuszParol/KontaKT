@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
-from kontakt.database.models import Invoice, InvoiceLine
+from kontakt.database.models import Document, DocumentLine
 
 class AIEngine:
     def __init__(self):
@@ -13,18 +13,18 @@ class AIEngine:
     def train(self):
         """Trenuje model z zapisanych historycznych faktur."""
         # Pobieramy linie faktur wraz z opisem z powiązanej faktury
-        query = (InvoiceLine
-                 .select(InvoiceLine.account_wn_id, InvoiceLine.account_ma_id, Invoice.description)
-                 .join(Invoice)
+        query = (DocumentLine
+                 .select(DocumentLine.account_wn_id, DocumentLine.account_ma_id, Document.description)
+                 .join(Document)
                  .where(
-                     Invoice.description.is_null(False),
-                     Invoice.description != ""
+                     Document.description.is_null(False),
+                     Document.description != ""
                  ))
         
         X_raw = []
         y_raw = []
         for line in query:
-            desc = line.invoice.description.strip()
+            desc = line.document.description.strip()
             label = f"{line.account_wn_id}_{line.account_ma_id}"
             X_raw.append(desc)
             y_raw.append(label)

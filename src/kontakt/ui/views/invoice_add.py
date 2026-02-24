@@ -1,7 +1,7 @@
 import threading
 import customtkinter as ctk
 from datetime import date
-from kontakt.database.models import Contractor, Invoice, Account, InvoiceLine
+from kontakt.database.models import Contractor, Document, Account, DocumentLine
 from kontakt.ui.components.selection_modal import SelectionModal
 
 class InvoiceAddView(ctk.CTkFrame):
@@ -212,7 +212,8 @@ class InvoiceAddView(ctk.CTkFrame):
 
         try:
             # Tworzymy fakturę
-            invoice = Invoice.create(
+            document = Document.create(
+                document_type="Faktura",
                 number=number,
                 date_issue=date_issue,
                 description=desc,
@@ -221,8 +222,8 @@ class InvoiceAddView(ctk.CTkFrame):
             )
             
             # Tworzymy linię dekretacyjną (to ona jest uzywana do nauki AI)
-            InvoiceLine.create(
-                invoice=invoice,
+            DocumentLine.create(
+                document=document,
                 account_wn_id=wn_id,
                 account_ma_id=ma_id,
                 amount=float(amount.replace(',', '.'))

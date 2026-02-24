@@ -4,7 +4,7 @@ from tkinter import ttk
 import os
 import platform
 import subprocess
-from kontakt.database.models import Invoice
+from kontakt.database.models import Document
 from kontakt.services.exporter import export_invoice_to_pdf, export_journal_to_excel
 
 class HistoryView(ctk.CTkFrame):
@@ -77,11 +77,11 @@ class HistoryView(ctk.CTkFrame):
             
         phrase = self.entry_search.get().strip()
         
-        query = Invoice.select()
+        query = Document.select()
         if phrase:
-            query = query.where(Invoice.number.contains(phrase) | Invoice.description.contains(phrase))
+            query = query.where(Document.number.contains(phrase) | Document.description.contains(phrase))
 
-        invoices = query.order_by(Invoice.date_issue.desc())
+        invoices = query.order_by(Document.date_issue.desc())
         
         for inv in invoices:
             self.tree.insert("", "end", values=(inv.id, str(inv.date_issue), inv.number, inv.contractor.name, str(inv.amount)))

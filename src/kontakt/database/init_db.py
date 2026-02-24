@@ -1,11 +1,13 @@
 
 from kontakt.database.db import database
-from kontakt.database.models import Account, Contractor, Invoice, InvoiceLine
+from kontakt.database.models import Account, Contractor, Document, DocumentLine
 
 def init_db():
     print("Inicjalizacja bazy danych...")
-    database.connect()
-    database.create_tables([Account, Contractor, Invoice, InvoiceLine], safe=True)
+    database.connect(reuse_if_open=True)
+    
+    # Tworzenie tabel
+    database.create_tables([Account, Contractor, Document, DocumentLine], safe=True)
     
     # Seed default accounts (Budget Units)
     default_accounts = [

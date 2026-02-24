@@ -17,16 +17,17 @@ class Contractor(BaseModel):
     name = CharField()
     address = TextField(null=True)
 
-class Invoice(BaseModel):
+class Document(BaseModel):
+    document_type = CharField(default="Faktura")
     number = CharField()
     date_issue = DateField()
     description = TextField() # Opis zdarzenia dla AI
     amount = DecimalField(max_digits=10, decimal_places=2)
-    contractor = ForeignKeyField(Contractor, backref='invoices')
+    contractor = ForeignKeyField(Contractor, backref='documents')
     created_at = DateField(default=datetime.date.today)
 
-class InvoiceLine(BaseModel):
-    invoice = ForeignKeyField(Invoice, backref='lines')
+class DocumentLine(BaseModel):
+    document = ForeignKeyField(Document, backref='lines')
     account_wn = ForeignKeyField(Account, backref='lines_wn')
     account_ma = ForeignKeyField(Account, backref='lines_ma')
     amount = DecimalField(max_digits=10, decimal_places=2)

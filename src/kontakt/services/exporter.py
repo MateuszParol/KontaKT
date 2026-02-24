@@ -1,12 +1,12 @@
 import os
 import pandas as pd
 from fpdf import FPDF
-from kontakt.database.models import Invoice
+from kontakt.database.models import Document
 
-def export_invoice_to_pdf(invoice_id: int, filepath: str) -> tuple[bool, str]:
+def export_invoice_to_pdf(document_id: int, filepath: str) -> tuple[bool, str]:
     """Generuje Polecenie Księgowania do pliku PDF."""
     try:
-        invoice = Invoice.get_by_id(invoice_id)
+        invoice = Document.get_by_id(document_id)
         
         pdf = FPDF()
         pdf.add_page()
@@ -58,7 +58,7 @@ def export_journal_to_excel(filepath: str) -> tuple[bool, str]:
     """Generuje zestawienie (Dziennik Księgowań) do Excela .xlsx ."""
     try:
         data = []
-        for invoice in Invoice.select().order_by(Invoice.date_issue.desc()):
+        for invoice in Document.select().order_by(Document.date_issue.desc()):
             for line in invoice.lines:
                 data.append({
                     "Dokument": invoice.number,
