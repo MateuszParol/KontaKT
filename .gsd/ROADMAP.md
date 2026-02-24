@@ -6,8 +6,8 @@
 ## Must-Haves
 - [x] Nawigacja górna (Navbar) obok/zamiast Sidebar'a dla zwiększonej liczby funkcji.
 - [x] Obsługa wielu typów dokumentów (wyciągi, noty, wyciągi bankowe) - rozszerzenie księgowania poza same faktury zakupowe.
-- [ ] Szybkie wybieranie ostatnich kont (np. podwójne kliknięcie) i klonowanie pozycji dekretacji, dla seryjnego wprowadzania podobnych pozycji.
-- [ ] Naprawa importu kontrahentów (usunięcie ".0" z formatu NIP).
+- [x] Szybkie wybieranie ostatnich kont (np. podwójne kliknięcie) i klonowanie pozycji dekretacji, dla seryjnego wprowadzania podobnych pozycji.
+- [x] Naprawa importu kontrahentów (usunięcie ".0" z formatu NIP).
 - [ ] Wystawianie faktur ustrukturyzowanych (Kreator faktur sprzedaży z exportem do XML dla KSeF).
 
 ## Phases
@@ -17,7 +17,7 @@
 **Objective**: Wdrożenie paska nawigacyjnego (Navbar) u góry ekranu i reorganizacja widoków. Rozbudowa modelu bazy danych o typy dokumentów (zastąpienie sztywnego `Invoice` uniwersalnym `Document`).
 
 ### Phase 2: Poprawki UX - Ergonomia wprowadzania danych
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Wdrożenie pamięci ostatnio użytych kont i możliwości kliknięcia aby szybko je wybrać. Wprowadzenie funkcji "Dodaj kolejną pozycję" / powielania wierszy dekretacji. Poprawka konwersji typów w imporcie z Excela (naprawa NIP).
 
 ### Phase 3: Moduł Sprzedaży (Kreator Faktur)
