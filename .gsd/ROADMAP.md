@@ -8,7 +8,7 @@
 - [x] Obsługa wielu typów dokumentów (wyciągi, noty, wyciągi bankowe) - rozszerzenie księgowania poza same faktury zakupowe.
 - [x] Szybkie wybieranie ostatnich kont (np. podwójne kliknięcie) i klonowanie pozycji dekretacji, dla seryjnego wprowadzania podobnych pozycji.
 - [x] Naprawa importu kontrahentów (usunięcie ".0" z formatu NIP).
-- [ ] Wystawianie faktur ustrukturyzowanych (Kreator faktur sprzedaży z exportem do XML dla KSeF).
+- [x] Wystawianie faktur ustrukturyzowanych (Kreator faktur sprzedaży z exportem do XML dla KSeF).
 
 ## Phases
 
@@ -21,9 +21,9 @@
 **Objective**: Wdrożenie pamięci ostatnio użytych kont i możliwości kliknięcia aby szybko je wybrać. Wprowadzenie funkcji "Dodaj kolejną pozycję" / powielania wierszy dekretacji. Poprawka konwersji typów w imporcie z Excela (naprawa NIP).
 
 ### Phase 3: Moduł Sprzedaży (Kreator Faktur)
-**Status**: ⬜ Not Started
-**Objective**: Utworzenie okna wystawiania własnych faktur. Dodawanie rzędów asortymentu, liczenie podatku VAT.
+**Status**: ✅ Complete
+**Objective**: Utworzenie okna wystawiania własnych faktur. Dodawanie rzędów asortymentu, liczenie podatku VAT. Stworzenie tabel powiązanych z KSeF (XML) z niezależnym Katalogiem Produktów.
 
 ### Phase 4: Integracja KSeF (Eksport XML)
-**Status**: ⬜ Not Started
-**Objective**: Implementacja mappera i eksportera danych wystawionej faktury na schemat ustrukturyzowany KSeF (XML).
+**Status**: ✅ Complete
+**Objective**: Implementacja mappera i eksportera danych wystawionej faktury na schemat ustrukturyzowany KSeF (XML). Stworzenie panelu Ustawień do parametryzacji stałych danych urzędu (Sprzedawcy).
