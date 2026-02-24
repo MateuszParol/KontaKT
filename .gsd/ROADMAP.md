@@ -13,7 +13,7 @@
 ## Phases
 
 ### Phase 1: Architektura Motywów i Główne Kolory
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Wdrożenie centralnego menedżera Themingu dla CustomTkinter. Zaprojektowanie palety Tokyo Night (Dark) oraz kompatybilnego motywu Light. Przełączenie głównych kontenerów na nowe kolory.
 
 ### Phase 2: Animowane Przejścia i Toggle
