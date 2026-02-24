@@ -27,11 +27,13 @@
 
 ## Phase 5 Decisions
 
-**Date:** 2026-02-23 (In Progress)
+**Date:** 2026-02-24 (In Progress)
 
 ### Approach
 - **Listy (Konta, Kontrahenci, Historia) - Chose:** Zastąpienie CTkScrollableFrame natywnym widgetem **`ttk.Treeview`** przestylowanym pod projekt. Jest to rekomendowane i jedyne rozsądne rozwiązanie umożliwiające ładowanie dziesiątek tysięcy wierszy naraz bez zamrażania UI w CustomTkinter. Limit = brak. Opcja szukajki z Fazy 4 pozostanie jako dynamiczne zawężanie.
+**User Confirmation (2026-02-24):** Używamy standardowego `ttk.Treeview` (opcja A) dla maksymalnej wydajności, trzymając kod otwarty na lepszy styling w przyszłym kamieniu milowym.
 - **Drop-downy z autouzupełnianiem (Wybrór rekordu) - Chose:** Odrzucenie CTkOptionMenu na rzecz "Modalnego Okienka" (Pop-up Toplevel) wyposażonego w widget wyszukiwania + podgląd Listbox/Treeview. Jest to optymalny UX, umożliwiający w fakturach wpisanie części nazwy by zatwierdzić dany wybór z dużej biblioteki bez pomyłek.
+**User Confirmation (2026-02-24):** Zgoda na w pełni modalne (blokujące główne okno) zachowanie pod-okienek wyboru.
 
 ### Constraints
-- Widget `ttk.Treeview` wymaga własnego podpięcia paska przewijania (Scrollbar) oraz zmiany konfiguracji `style.configure` na ciemne tło by nie psuć DarkMode CustomTkintera.
+- Widget `ttk.Treeview` wymaga własnego podpięcia paska przewijania (Scrollbar) oraz zmiany konfiguracji `style.configure` na ciemne tło by nie psuć DarkMode CustomTkintera. Pamiętać o architekturze gotowej na zmiany (Next Milestone).
