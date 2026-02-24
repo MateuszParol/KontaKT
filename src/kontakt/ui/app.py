@@ -62,7 +62,7 @@ class App(ctk.CTk):
         self.grid_rowconfigure(1, weight=1) # Content flexible
 
         # Navbar
-        self.navbar = Navbar(self, self.show_view, self.theme_manager)
+        self.navbar = Navbar(self, self.show_view, self.theme_manager, self._on_theme_toggle)
         self.navbar.grid(row=0, column=0, sticky="ew")
 
         # Content Area (Frame)
@@ -103,3 +103,8 @@ class App(ctk.CTk):
             # Placeholder
             lbl = ctk.CTkLabel(self.content_frame, text=f"Widok: {view_name} (W budowie)", font=("Roboto", 24))
             lbl.pack(pady=50)
+
+    def _on_theme_toggle(self, x, y):
+        # Callback from Navbar when the theme button is clicked.
+        # For now, just print the event so we know things are wired up.
+        print(f"Theme toggled at X:{x} Y:{y}")
