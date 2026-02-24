@@ -332,13 +332,20 @@ class DocumentAddView(ctk.CTkFrame):
         contractor_id = self.contractor_id
         queued_lines = self.tree.get_children()
         
-        if not all([doc_type, number, date_issue, desc, contractor_id]):
-            self.lbl_status.configure(text="Błąd: Wypełnij wszystkie pola w nagłówku!", text_color="red")
+        if not all([doc_type, number, date_issue]):
+            self.lbl_status.configure(text="Błąd: Wypełnij Numer i Datę w nagłówku!", text_color="red")
+            return
+            
+        if not contractor_id:
+            self.lbl_status.configure(text="Błąd: Musisz wybrać kontrahenta!", text_color="red")
             return
             
         if not queued_lines:
-            self.lbl_status.configure(text="Błąd: Brak pozycji dekretacyjnych do zapisu!", text_color="red")
+            self.lbl_status.configure(text="Błąd: Brak pozycji dekretacyjnych do zapisu! (Najpierw dodaj pozycję)", text_color="red")
             return
+            
+        if not desc:
+            desc = f"{doc_type} nr {number}"
 
         try:
             # Calculate total header amount (sum of all queue lines)
