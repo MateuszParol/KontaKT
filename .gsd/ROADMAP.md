@@ -4,8 +4,8 @@
 > **Goal**: Wprowadzenie obsługi wielu typów dokumentów księgowych, poprawa ergonomii wprowadzania danych (UX) oraz stworzenie modułu do wystawiania własnych faktur z funkcją eksportu KSeF (XML).
 
 ## Must-Haves
-- [ ] Nawigacja górna (Navbar) obok/zamiast Sidebar'a dla zwiększonej liczby funkcji.
-- [ ] Obsługa wielu typów dokumentów (wyciągi, noty, wyciągi bankowe) - rozszerzenie księgowania poza same faktury zakupowe.
+- [x] Nawigacja górna (Navbar) obok/zamiast Sidebar'a dla zwiększonej liczby funkcji.
+- [x] Obsługa wielu typów dokumentów (wyciągi, noty, wyciągi bankowe) - rozszerzenie księgowania poza same faktury zakupowe.
 - [ ] Szybkie wybieranie ostatnich kont (np. podwójne kliknięcie) i klonowanie pozycji dekretacji, dla seryjnego wprowadzania podobnych pozycji.
 - [ ] Naprawa importu kontrahentów (usunięcie ".0" z formatu NIP).
 - [ ] Wystawianie faktur ustrukturyzowanych (Kreator faktur sprzedaży z exportem do XML dla KSeF).
