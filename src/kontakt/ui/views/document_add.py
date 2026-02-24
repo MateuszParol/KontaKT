@@ -105,10 +105,18 @@ class DocumentAddView(ctk.CTkFrame):
 
     def open_contractor_modal(self):
         def fetch_contractors(phrase):
-            query = Contractor.select()
-            if phrase:
-                query = query.where(Contractor.name.contains(phrase) | Contractor.nip.contains(phrase))
-            return [(c.id, c.nip or "-", c.name) for c in query.order_by(Contractor.name)]
+            all_contractors = Contractor.select().order_by(Contractor.name)
+            if not phrase:
+                return [(c.id, c.nip or "-", c.name) for c in all_contractors]
+                
+            clean_phrase = phrase.replace("-", "").replace(" ", "").lower()
+            results = []
+            for c in all_contractors:
+                c_nip = (c.nip or "").replace("-", "").replace(" ", "").lower()
+                c_name = c.name.lower()
+                if clean_phrase in c_nip or clean_phrase in c_name:
+                    results.append((c.id, c.nip or "-", c.name))
+            return results
             
         def on_select(values):
             self.contractor_id = int(values[0])
@@ -124,10 +132,18 @@ class DocumentAddView(ctk.CTkFrame):
 
     def open_account_modal(self, acc_type):
         def fetch_accounts(phrase):
-            query = Account.select()
-            if phrase:
-                query = query.where(Account.name.contains(phrase) | Account.symbol.contains(phrase))
-            return [(a.id, a.symbol, a.name) for a in query.order_by(Account.symbol)]
+            all_accounts = Account.select().order_by(Account.symbol)
+            if not phrase:
+                return [(a.id, a.symbol, a.name) for a in all_accounts]
+                
+            clean_phrase = phrase.replace("-", "").replace(" ", "").lower()
+            results = []
+            for a in all_accounts:
+                a_symbol = a.symbol.replace("-", "").replace(" ", "").lower()
+                a_name = a.name.lower()
+                if clean_phrase in a_symbol or clean_phrase in a_name:
+                    results.append((a.id, a.symbol, a.name))
+            return results
             
         def on_select(values):
             if acc_type == "wn":

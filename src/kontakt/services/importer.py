@@ -64,7 +64,7 @@ def import_contractors_from_excel(filepath: str) -> tuple[int, str]:
         from kontakt.database.models import Contractor
         
         engine = 'xlrd' if filepath.lower().endswith('.xls') else 'openpyxl'
-        df = pd.read_excel(filepath, engine=engine)
+        df = pd.read_excel(filepath, engine=engine, dtype={'NIP': str})
         
         # Weryfikacja niezbędnych kolumn by stwierdzić, że to nie jest zupełnie zły plik
         if 'Pełna nazwa' not in df.columns and 'Nazwa skrócona' not in df.columns:
@@ -84,6 +84,8 @@ def import_contractors_from_excel(filepath: str) -> tuple[int, str]:
 
             # NIP
             nip = str(row.get('NIP', '')).replace('-', '').strip()
+            if nip.endswith('.0'): 
+                nip = nip[:-2]
             if nip.lower() == 'nan' or not nip:
                  nip = None # Peewee null
                  
