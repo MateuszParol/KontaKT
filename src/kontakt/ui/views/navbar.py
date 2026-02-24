@@ -11,6 +11,7 @@ class Navbar(ctk.CTkFrame):
         
         # Navigation Buttons
         self.btn_new = self.create_button("Dokumenty", "document_add")
+        self.btn_sales = self.create_button("Wystaw Fakturę", "invoice_creator")
         self.btn_history = self.create_button("Historia", "history")
         self.btn_accounts = self.create_button("Plan Kont", "accounts")
         self.btn_contractors = self.create_button("Kontrahenci", "contractors")

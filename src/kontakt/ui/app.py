@@ -80,6 +80,10 @@ class App(ctk.CTk):
         elif view_name == "accounts":
             view = AccountsView(self.content_frame)
             view.pack(fill="both", expand=True)
+        elif view_name == "invoice_creator":
+            from kontakt.ui.views.invoice_creator import InvoiceCreatorView
+            view = InvoiceCreatorView(self.content_frame)
+            view.pack(fill="both", expand=True)
         elif view_name == "contractors":
             view = ContractorsView(self.content_frame)
             view.pack(fill="both", expand=True)
