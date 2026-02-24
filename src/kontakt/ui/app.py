@@ -105,54 +105,14 @@ class App(ctk.CTk):
             lbl.pack(pady=50)
 
     def _on_theme_toggle(self, x, y):
-        # Callback from Navbar when the theme button is clicked.
-        self.animate_theme_toggle(x, y)
+        # Update mode logic inside ThemeManager is already triggered
+        ctk_mode = "Dark" if self.theme_manager.current_mode == "dark" else "Light"
         
-    def animate_theme_toggle(self, start_x, start_y):
-        # Calculate start coordinates relative to the window
-        # winfo_rootx() is screen coord, winfo_x() is relative to parent. 
-        # But we need relative to App window.
-        rel_x = start_x - self.winfo_rootx()
-        rel_y = start_y - self.winfo_rooty()
+        # Globally trigger CustomTkinter to update all internal un-hardcoded widgets perfectly!
+        ctk.set_appearance_mode(ctk_mode)
         
-        # Determine target color for the animation
-        target_color = self.theme_manager.get_color("bg_main")
-        
-        # Create a top-level canvas
-        import tkinter as tk
-        canvas = tk.Canvas(self, bg=self.cget("bg"), highlightthickness=0)
-        canvas.place(relx=0, rely=0, relwidth=1, relheight=1)
-        
-        # We need the canvas to let clicks pass through or just block temporarily?
-        # A 800ms block is fine.
-        
-        radius = 1
-        max_radius = ((self.winfo_width() ** 2) + (self.winfo_height() ** 2)) ** 0.5
-        
-        # Draw initial circle
-        circle_id = canvas.create_oval(
-            rel_x - radius, rel_y - radius, 
-            rel_x + radius, rel_y + radius, 
-            fill=target_color, outline=target_color
-        )
-        
-        def _animate_step():
-            nonlocal radius
-            radius += max(15, radius * 0.15) # Exponential growth
-            
-            canvas.coords(
-                circle_id, 
-                rel_x - radius, rel_y - radius, 
-                rel_x + radius, rel_y + radius
-            )
-            
-            if radius < max_radius:
-                self.after(16, _animate_step) # ~60fps
-            else:
-                self._apply_theme_colors()
-                canvas.destroy()
-                
-        _animate_step()
+        # Update manually set colors for navbar and main frame
+        self._apply_theme_colors()
         
     def _apply_theme_colors(self):
         # Change main app background
