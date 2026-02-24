@@ -1,10 +1,11 @@
 ## Current Position
-- **Phase**: 5 (completed)
-- **Task**: All tasks complete
-- **Status**: Verified
+- **Milestone**: v1.0 (MVP) - COMPLETED
+- **Phase**: None
+- **Task**: Archiving complete
+- **Status**: Ready for Next Milestone
 
 ## Last Session Summary
-Phase 5 executed successfully. 2 plans, 4 tasks completed. Replaced rendering engine with high-performance `ttk.Treeview` and built reusable modal selection dialogs.
+Abandoned Phase 6 (Installer) as premature per user request. Fired `/complete-milestone` to archive Phases 1-5 into `.gsd/milestones/v1.0-MVP/` and recorded `v1.0-MVP-SUMMARY.md`. Cleared `ROADMAP.md` for the next planning phase.
 
 ## Next Steps
-1. Proceed to Phase 6
+1. /new-milestone (or /plan) to generate requirements and phases for v2.0.
